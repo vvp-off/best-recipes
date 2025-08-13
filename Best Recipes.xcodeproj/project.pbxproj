@@ -11,7 +11,7 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F4AA65982E49E86200E400D0 /* Exceptions for "Best Recipes" folder in "Best Recipes" target */ = {
+		BE1147B62E4C91350014E49B /* Exceptions for "Best Recipes" folder in "Best Recipes" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				App/Info.plist,
@@ -24,7 +24,7 @@
 		F4AA65882E49E86100E400D0 /* Best Recipes */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				F4AA65982E49E86200E400D0 /* Exceptions for "Best Recipes" folder in "Best Recipes" target */,
+				BE1147B62E4C91350014E49B /* Exceptions for "Best Recipes" folder in "Best Recipes" target */,
 			);
 			path = "Best Recipes";
 			sourceTree = "<group>";
@@ -145,6 +145,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQUZ4C55P5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Best Recipes/App/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -176,6 +177,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQUZ4C55P5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Best Recipes/App/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
