@@ -10,22 +10,9 @@
 		F4AA65862E49E86100E400D0 /* Best Recipes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Best Recipes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
-/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		F4AA65982E49E86200E400D0 /* Exceptions for "Best Recipes" folder in "Best Recipes" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				App/Info.plist,
-			);
-			target = F4AA65852E49E86100E400D0 /* Best Recipes */;
-		};
-/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
-
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F4AA65882E49E86100E400D0 /* Best Recipes */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				F4AA65982E49E86200E400D0 /* Exceptions for "Best Recipes" folder in "Best Recipes" target */,
-			);
 			path = "Best Recipes";
 			sourceTree = "<group>";
 		};
