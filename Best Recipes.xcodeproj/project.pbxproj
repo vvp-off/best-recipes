@@ -10,9 +10,22 @@
 		F4AA65862E49E86100E400D0 /* Best Recipes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Best Recipes.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		BE1147B62E4C91350014E49B /* Exceptions for "Best Recipes" folder in "Best Recipes" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				App/Info.plist,
+			);
+			target = F4AA65852E49E86100E400D0 /* Best Recipes */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F4AA65882E49E86100E400D0 /* Best Recipes */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				BE1147B62E4C91350014E49B /* Exceptions for "Best Recipes" folder in "Best Recipes" target */,
+			);
 			path = "Best Recipes";
 			sourceTree = "<group>";
 		};
@@ -132,6 +145,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQUZ4C55P5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Best Recipes/App/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -163,6 +177,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = CQUZ4C55P5;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Best Recipes/App/Info.plist";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;

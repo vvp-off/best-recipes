@@ -25,9 +25,9 @@ enum Endpoint {
             return "/recipes/complexSearch"
         case .getPopularRecipes:
             return "/recipes/complexSearch"
-        case .getRecipesForMealType(let type):
+        case .getRecipesForMealType(type: _):
             return "/recipes/complexSearch"
-        case .getRecipeInfoBulk(let idRecipes):
+        case .getRecipeInfoBulk(idRecipes: _):
             return "/recipes/informationBulk"
         }
     }
