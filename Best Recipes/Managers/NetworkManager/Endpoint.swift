@@ -12,7 +12,7 @@ enum Endpoint {
     case getRandomRecipes
     case searchRecipes
     case getPopularRecipes
-    case getRecipesForMealType(type: String)
+    case getRecipesForMealType(type: MealType)
     case getRecipeInfoBulk(idRecipes: [Int])
     
     var path: String {

@@ -21,6 +21,10 @@ struct RecipeResults: Codable {
     let results: [RecipeInfo]?
 }
 
+struct RandomRecipeResponse: Codable {
+    let recipes: [RecipeInfo]?
+}
+
 struct SearchRecipe: Codable, RecipeProtocol {
     let id: Int
     let title: String?
@@ -71,6 +75,10 @@ struct ExtendedIngredient: Codable {
     let amount: Double?
     var imageURL: String {
         "https://spoonacular.com/cdn/ingredients_100x100/\(imageIngredient ?? "")"
+    }
+    private enum CodingKeys: String, CodingKey {
+        case id, name, unit, amount
+        case imageIngredient = "image"
     }
 }
 
