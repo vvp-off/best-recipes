@@ -44,9 +44,9 @@ struct RecipeInfo: Codable, RecipeProtocol {
     let aggregateLikes: Int?
     let sourceName: String?
     let dishTypes: [String]?
-    let extendedIngredients: [ExtendedIngredient]?
     let analyzedInstructions: [AnalyzedInstruction]?
-    
+    var extendedIngredients: [ExtendedIngredient]?
+
     var rating: String? {
         guard let likes = aggregateLikes else { return "❤️ 0"}
         switch likes {
@@ -76,6 +76,8 @@ struct ExtendedIngredient: Codable {
     var imageURL: String {
         "https://spoonacular.com/cdn/ingredients_100x100/\(imageIngredient ?? "")"
     }
+    var isChecked: Bool = false
+    
     private enum CodingKeys: String, CodingKey {
         case id, name, unit, amount
         case imageIngredient = "image"
