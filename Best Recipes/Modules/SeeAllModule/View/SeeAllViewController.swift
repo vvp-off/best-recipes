@@ -72,6 +72,11 @@ extension SeeAllViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: SeeAllCollectionViewCell.reuseIdentifier, for: indexPath) as? SeeAllCollectionViewCell else {
             return UICollectionViewCell()
         }
+        let recipe = presenter.seeAllRecipes[indexPath.item]
+        
+        cell.configureCell(recipe: recipe) {
+            //
+        }
         return cell
     }
 }
@@ -79,6 +84,11 @@ extension SeeAllViewController: UICollectionViewDataSource {
 //MARK: UICollectionViewDelegate
 extension SeeAllViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        
+        let recipe = presenter.seeAllRecipes[indexPath.item]
+        //
     }
+}
+
+extension SeeAllViewController: SeeAllViewProtocol {
+
 }
