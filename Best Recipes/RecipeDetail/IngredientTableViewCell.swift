@@ -9,6 +9,7 @@ final class IngredientTableViewCell: UITableViewCell {
         static let iconSize: CGFloat = 52
         static let iconCornerRadius: CGFloat = 8
         static let nameLeadingFromIcon: CGFloat = 24
+        static let nameLabelSize: CGFloat = 120
         static let checkButtonTrailing: CGFloat = 16
         static let checkButtonSize: CGFloat = 24
         static let checkButtonCornerRadius: CGFloat = 12
@@ -41,6 +42,8 @@ final class IngredientTableViewCell: UITableViewCell {
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 2
+        label.lineBreakMode = .byWordWrapping
         label.font = UIFont.systemFont(ofSize: 16, weight: .semibold)
         label.textColor = .black
         return label
@@ -58,7 +61,6 @@ final class IngredientTableViewCell: UITableViewCell {
         let button = UIButton(type: .custom)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.layer.cornerRadius = Layout.checkButtonCornerRadius
-        button.setImage(UIImage(resource: .iconcCircleBlack), for: .normal)
         button.addTarget(
             self,
             action: #selector(checkButtonAction),
@@ -78,11 +80,21 @@ final class IngredientTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func configure(with ingredient: Ingredient) {
-        nameLabel.text = ingredient.name
-        amountLabel.text = ingredient.amount
-        iconImageView.image = createEmojiImage(from: ingredient.iconName)
-
+    func configure(with ingredient: ExtendedIngredient) {
+        nameLabel.text = ingredient.name ?? "Unknown"
+        
+        if let amount = ingredient.amount, let unit = ingredient.unit {
+            amountLabel.text = "\(amount) \(unit)"
+        } else {
+            amountLabel.text = ""
+        }
+        
+        if let url = URL(string: ingredient.imageURL) {
+            loadImage(from: url, into: iconImageView)
+        } else {
+            iconImageView.image = UIImage(systemName: "photo")
+        }
+        
         if ingredient.isChecked {
             checkButton.setImage(UIImage(resource: .iconcCircleRed), for: .normal)
         } else {
@@ -95,27 +107,24 @@ final class IngredientTableViewCell: UITableViewCell {
         backgroundColor = .clear
     }
 
-    private func createEmojiImage(from emoji: String) -> UIImage? {
-        let label = UILabel()
-        label.text = emoji
-        label.font = UIFont.systemFont(ofSize: 40)
-        label.textAlignment = .center
-        label.frame = CGRect(x: 0, y: 0, width: Layout.iconSize, height: Layout.iconSize)
-        
-        UIGraphicsBeginImageContextWithOptions(label.frame.size, false, 0)
-        defer { UIGraphicsEndImageContext() }
-        label.layer.render(in: UIGraphicsGetCurrentContext()!)
-        return UIGraphicsGetImageFromCurrentImageContext()
+    private func loadImage(from url: URL, into imageView: UIImageView) {
+        URLSession.shared.dataTask(with: url) { data, _, _ in
+            if let data = data, let image = UIImage(data: data) {
+                DispatchQueue.main.async {
+                    imageView.image = image
+                }
+            }
+        }.resume()
     }
 
     @objc private func checkButtonAction() {
         checkButtonTapped?()
     }
-
-  
 }
 
+
 // MARK: - Setup Constraints
+
 private extension IngredientTableViewCell {
     func addSubviews() {
         contentView.addSubview(containerView)
@@ -139,6 +148,7 @@ private extension IngredientTableViewCell {
             iconImageView.heightAnchor.constraint(equalToConstant: Layout.iconSize),
 
             nameLabel.leadingAnchor.constraint(equalTo: iconImageView.trailingAnchor, constant: Layout.nameLeadingFromIcon),
+            nameLabel.widthAnchor.constraint( equalToConstant: Layout.nameLabelSize),
             nameLabel.centerYAnchor.constraint(equalTo: containerView.centerYAnchor),
 
             amountLabel.trailingAnchor.constraint(equalTo: checkButton.leadingAnchor, constant: -Layout.labelTrailingFromCheckButton),
