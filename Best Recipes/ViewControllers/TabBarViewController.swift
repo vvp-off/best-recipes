@@ -51,10 +51,10 @@ final class TabBarViewController: UITabBarController {
 
     
 //  MARK: - TabBarItem and ViewControllers setup
-    private func getMockVC() -> [ViewController] {
+    private func getMockVC() -> [UIViewController] {
         let firstVC = ViewController()
         firstVC.view.backgroundColor = .black
-        let secondVC = ViewController()
+        let secondVC = FavoriteViewController.create() //Stub
         secondVC.view.backgroundColor = .white
         let thirdVC = ViewController()
         thirdVC.view.backgroundColor = .green
