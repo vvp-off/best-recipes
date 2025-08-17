@@ -7,6 +7,10 @@
 
 import Foundation
 
+enum AppKeys {
+    static let didShowOnboarding = "showOnboarding"
+}
+
 // https://spoonacular.com/food-api/docs#Meal-Types
 // параметр для запроса = type
 enum MealType: String, CaseIterable {
