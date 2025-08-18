@@ -142,7 +142,7 @@ private final class FavoriteCell: UICollectionViewCell {
         titleText.text = model.title
         authorImageView.image = model.authorImage
         authorLabel.text = "By \(model.author)"
-        scoreLabel.configure(ratingValue: 2)
+        scoreLabel.configure(ratingValue: model.score)
         
         
         
