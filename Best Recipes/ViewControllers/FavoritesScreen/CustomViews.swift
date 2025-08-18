@@ -26,7 +26,11 @@ final class CircleImageView: UIImageView {
 
 final class ScoreLabel: UIView {
     
-    private let label = UILabel()
+    private let label: UILabel = {
+        let label = UILabel()
+        label.font = .poppinsSemiBold(size: 17)
+        return label
+    }()
     private let icon = UIImageView(image: .star)
     private var blurView: UIVisualEffectView
     
@@ -90,7 +94,14 @@ final class ScoreLabel: UIView {
 
 final class TimeLabel: UIView {
     
-    private let label = UILabel()
+    private let label: UILabel = {
+        let label = UILabel()
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .white
+        label.font = .poppinsRegular(size: 17)
+        return label
+    }()
+    
     private let blurView: UIVisualEffectView
     
     func configure( timeText: String) {

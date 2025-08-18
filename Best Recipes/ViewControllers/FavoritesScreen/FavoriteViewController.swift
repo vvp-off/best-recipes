@@ -29,6 +29,12 @@ final class FavoriteViewController: UIViewController {
     static func create() -> UIViewController {
         let viewController = FavoriteViewController()
         viewController.navigationItem.title = "Saved recipes"
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.titleTextAttributes = [.font: UIFont.poppinsSemiBold(size: 20)]
+        UINavigationBar.appearance().standardAppearance = appearance
+        
+        
         return viewController
     }
     
@@ -95,9 +101,17 @@ private final class FavoriteCell: UICollectionViewCell {
     static let reuseID = "FavoriteCell"
     
     private let mainImageView = UIImageView()
-    private let titleText = UILabel()
+    private let titleText: UILabel = {
+        let label = UILabel()
+        label.font = .poppinsSemiBold(size: 17)
+        return label
+    }()
     private let authorImageView = CircleImageView()
-    private let authorLabel = UILabel()
+    private let authorLabel: UILabel = {
+        let label = UILabel()
+        label.font = .poppinsRegular(size: 13)
+        return label
+    }()
     private let scoreLabel = ScoreLabel()
     private let durationLabel = TimeLabel()
     
