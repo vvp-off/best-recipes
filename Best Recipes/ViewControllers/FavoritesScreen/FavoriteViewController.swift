@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+// MARK: Model
 struct FavoriteCellModel: Hashable {
     let id = UUID()
     var score = 0.0
@@ -18,9 +18,7 @@ struct FavoriteCellModel: Hashable {
     var author = "John Doe"
 }
 
-enum Section: Hashable {
-    case main
-}
+
 
 final class FavoriteViewController: UIViewController {
     private var collectionView: UICollectionView!
@@ -101,7 +99,10 @@ final class FavoriteViewController: UIViewController {
 }
 
 
-
+// MARK: Collectionview Cell
+enum Section: Hashable {
+    case main
+}
 
 private final class FavoriteCell: UICollectionViewCell {
     static let reuseID = "FavoriteCell"
@@ -123,7 +124,7 @@ private final class FavoriteCell: UICollectionViewCell {
     
     private let favoriteButton = CircleButton(type: .system)
     
-    private var currentModel: FavoriteCellModel?
+    private var currentModel: FavoriteCellModel!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -237,3 +238,7 @@ private final class FavoriteCell: UICollectionViewCell {
     }
 }
 
+@available(iOS 17.0, *)
+#Preview {
+    FavoriteViewController()
+}

@@ -32,19 +32,18 @@ final class ScoreLabel: UIView {
         return label
     }()
     private let icon = UIImageView(image: .star)
-    private var blurView: UIVisualEffectView
+    private var blurView: UIVisualEffectView = .init(effect: UIBlurEffect(style: .regular))
     
     func configure( ratingValue: Double) {
         label.text = "\(ratingValue)"
     }
     
     
-    init(blurStyle: UIBlurEffect.Style = .systemUltraThinMaterial) {
-        blurView = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
+    init() {
         super.init(frame: .zero)
         setup()
     }
-
+    
     
     
     required init?(coder: NSCoder) {
@@ -64,25 +63,25 @@ final class ScoreLabel: UIView {
         blurView.translatesAutoresizingMaskIntoConstraints = false
         
         addSubview(blurView)
-        blurView.contentView.addSubview(icon)
-        blurView.contentView.addSubview(label)
+        addSubview(icon)
+        addSubview(label)
         [icon, label].forEach{
             $0.translatesAutoresizingMaskIntoConstraints = false}
         
         blurView.pinEdgesToView(self)
         
         NSLayoutConstraint.activate([
-            icon.leadingAnchor.constraint(equalTo: blurView.contentView.leadingAnchor, constant: 8),
-            icon.topAnchor.constraint(equalTo: blurView.contentView.topAnchor, constant: 8),
-            icon.bottomAnchor.constraint(equalTo: blurView.contentView.bottomAnchor, constant: -8),
+            icon.leadingAnchor.constraint(equalTo: blurView.leadingAnchor, constant: 8),
+            icon.topAnchor.constraint(equalTo: blurView.topAnchor, constant: 8),
+            icon.bottomAnchor.constraint(equalTo: blurView.bottomAnchor, constant: -8),
             icon.trailingAnchor.constraint(equalTo: label.leadingAnchor, constant: -8),
             
             icon.widthAnchor.constraint(equalToConstant: 12),
             icon.heightAnchor.constraint(equalToConstant: 12),
             
-            label.topAnchor.constraint(equalTo: blurView.contentView.topAnchor, constant: 8),
-            label.trailingAnchor.constraint(equalTo: blurView.contentView.trailingAnchor, constant: -8),
-            label.bottomAnchor.constraint(equalTo: blurView.contentView.bottomAnchor, constant: -8)
+            label.topAnchor.constraint(equalTo: blurView.topAnchor, constant: 8),
+            label.trailingAnchor.constraint(equalTo: blurView.trailingAnchor, constant: -8),
+            label.bottomAnchor.constraint(equalTo: blurView.bottomAnchor, constant: -8)
             
         ])
     }
@@ -102,16 +101,16 @@ final class TimeLabel: UIView {
         return label
     }()
     
-    private let blurView: UIVisualEffectView
+    private let blurView: UIVisualEffectView = .init(
+        effect: UIBlurEffect(
+            style: .regular))
     
     func configure( timeText: String) {
         label.text = timeText
     }
     
-    init(blurStyle: UIBlurEffect.Style = .systemUltraThinMaterial) {
-        blurView = UIVisualEffectView(effect: UIBlurEffect(style: blurStyle))
+    init() {
         super.init(frame: .zero)
-        label.textColor = .white
         setup()
     }
     
@@ -130,23 +129,24 @@ final class TimeLabel: UIView {
         translatesAutoresizingMaskIntoConstraints = false
         blurView.clipsToBounds = true
         blurView.translatesAutoresizingMaskIntoConstraints = false
-        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        
         addSubview(blurView)
-        blurView.contentView.addSubview(label)
-        
-        
-        label.textAlignment = .center
-        label.numberOfLines = 0
+        addSubview(label)
         
         blurView.pinEdgesToView(self)
         
         // Constraints
         NSLayoutConstraint.activate([
-            label.topAnchor.constraint(equalTo: blurView.contentView.topAnchor, constant: 4),
-            label.leadingAnchor.constraint(equalTo: blurView.contentView.leadingAnchor, constant: 4),
-            label.trailingAnchor.constraint(equalTo: blurView.contentView.trailingAnchor, constant: -4),
-            label.bottomAnchor.constraint(equalTo: blurView.contentView.bottomAnchor, constant: -4)
+            label.topAnchor.constraint(equalTo: blurView.topAnchor, constant: 4),
+            label.leadingAnchor.constraint(equalTo: blurView.leadingAnchor, constant: 4),
+            label.trailingAnchor.constraint(equalTo: blurView.trailingAnchor, constant: -4),
+            label.bottomAnchor.constraint(equalTo: blurView.bottomAnchor, constant: -4)
         ])
     }
 }
 
+@available(iOS 17.0, *)
+#Preview {
+    FavoriteViewController()
+}
