@@ -46,7 +46,7 @@ private extension BRCollectionTitle {
     func setUpTitle() {
         addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.font = UIFont.boldSystemFont(ofSize: 20)
+        titleLabel.font = .poppinsBold(size: 20)
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo: self.topAnchor),
@@ -58,7 +58,7 @@ private extension BRCollectionTitle {
     func setupSeeAll() {
         addSubview(seeAllButton)
         seeAllButton.translatesAutoresizingMaskIntoConstraints = false
-        seeAllButton.titleLabel?.font = UIFont.systemFont(ofSize: 14, weight: .bold)
+        seeAllButton.titleLabel?.font = .poppinsBold(size: 14)
         seeAllButton.setTitleColor(.red, for: .normal)
         seeAllButton.setTitle("See all", for: .normal)
         seeAllButton.setImage(UIImage(named: "arrow 1"), for: .normal)

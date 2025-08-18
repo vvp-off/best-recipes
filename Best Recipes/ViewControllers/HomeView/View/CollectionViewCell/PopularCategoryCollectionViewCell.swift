@@ -31,7 +31,7 @@ class PopularCategoryCollectionViewCell: UICollectionViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        label.font = .poppinsBold(size: 12)
         label.textColor = .black
         label.numberOfLines = 0
         return label
@@ -39,14 +39,14 @@ class PopularCategoryCollectionViewCell: UICollectionViewCell {
     
     private let timeLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .bold)
+        label.font = .poppinsBold(size: 12)
         label.textColor = .gray
         return label
     }()
     
     private let timeTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .medium)
+        label.font = .poppinsRegular(size: 12)
         label.textColor = .black
         return label
     }()
@@ -63,8 +63,26 @@ class PopularCategoryCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        titleLabel.preferredMaxLayoutWidth = titleLabel.frame.width
+    }
+    
 //     MARK: - Configuration
-    func configure() {}
+    func configure(with recipe: RecipeInfo) {
+        if let imageUrl = recipe.image, let url = URL(string: imageUrl) {
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                if let data = data {
+                    DispatchQueue.main.async {
+                        self.recipeImageView.image = UIImage(data: data)
+                    }
+                }
+            }.resume()
+        }
+        titleLabel.text = recipe.title
+        timeTitleLabel.text = "Time"
+        timeTitleLabel.text = "5 Mins"
+    }
 }
 
 // MARK: - Layout
@@ -104,14 +122,16 @@ extension PopularCategoryCollectionViewCell {
     func setupTitleLabel() {
         contentView.addSubview(titleLabel)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
-        titleLabel.text = "Chicken and Vegetable wrap"
         titleLabel.textAlignment = .center
+        titleLabel.numberOfLines = 2
+        titleLabel.lineBreakMode = .byTruncatingTail
+        titleLabel.setContentCompressionResistancePriority(.required, for: .vertical)
+        titleLabel.setContentHuggingPriority(.required, for: .vertical)
         
         NSLayoutConstraint.activate([
             titleLabel.topAnchor.constraint(equalTo:recipeImageView.bottomAnchor, constant: 16),
             titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
-            titleLabel.heightAnchor.constraint(equalToConstant: 40)
         ])
     }
     

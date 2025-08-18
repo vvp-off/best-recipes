@@ -7,11 +7,18 @@
 
 import UIKit
 
-class HomeViewController: UIViewController {
+protocol HomeViewProtocol: AnyObject {
+    func displayTrendingRecipes(_ recipes: [RecipeInfo])
+    func displayPopularRecipes(_ recipes: [RecipeInfo])
+    func displayRecentRecipes(_ recipes: [RecipeInfo])
+    func displayPopularCreators(_ creators: [RecipeInfo])
+}
+
+class HomeViewController: UIViewController, HomeViewProtocol {
     
     // MARK: - Properties
     var presenter: HomePresenterProtocol
-    
+
     // MARK: - Views
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -71,9 +78,10 @@ class HomeViewController: UIViewController {
     }()
     
     // MARK: - Initializers
-    init(presenter: HomePresenter) {
+    init(presenter: HomePresenterProtocol) {
         self.presenter = presenter
         super.init(nibName: nil, bundle: nil)
+        self.presenter.view = self
     }
     
     required init?(coder: NSCoder) {
@@ -86,7 +94,33 @@ class HomeViewController: UIViewController {
         view.backgroundColor = .white
         setupNavigationTitle()
         setupViews()
+        presenter.viewDidLoad()
     }
+    
+    // MARK: - HomeViewProtocol
+        func displayTrendingRecipes(_ recipes: [RecipeInfo]) {
+            DispatchQueue.main.async {
+                self.trendingCollection.reloadData()
+            }
+        }
+        
+        func displayPopularRecipes(_ recipes: [RecipeInfo]) {
+            DispatchQueue.main.async {
+                self.popularCategoryCollection.reloadData()
+            }
+        }
+        
+        func displayRecentRecipes(_ recipes: [RecipeInfo]) {
+            DispatchQueue.main.async {
+                self.recentRecipeCollection.reloadData()
+            }
+        }
+        
+        func displayPopularCreators(_ creators: [RecipeInfo]) {
+            DispatchQueue.main.async {
+                self.popularCreatorCollection.reloadData()
+            }
+        }
     
     private func setupNavigationTitle() {
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -304,38 +338,45 @@ extension HomeViewController {
 extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         switch collectionView.tag {
-        case 1:
-            return 10
-        case 2:
-            return 10
-        case 3:
-            return 10
-        case 4:
-            return 10
-        case 5:
-            return 10
-        default:
-            return 0
+        case 1: return presenter.trendingRecipes.count
+        case 2: return presenter.categories.count
+        case 3: return presenter.popularRecipes.count
+        case 4: return presenter.recentRecipes.count
+        case 5: return presenter.popularCreators.count
+        default: return 0
         }
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         switch collectionView.tag {
         case 1:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrandingViewCell", for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrandingViewCell", for: indexPath) as! TrandingCollectionViewCell
+            let recipe = presenter.trendingRecipes[indexPath.item]
+            cell.configure(with: recipe) {
+                print("save")
+            }
             return cell
         case 2:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoryViewCell", for: indexPath)
-            return cell 
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "CategoryViewCell", for: indexPath) as! CategoryCollectionViewCell
+            let category = presenter.categories[indexPath.item]
+            cell.configure(with: category)
+            return cell
         case 3:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PopularViewCell", for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PopularViewCell", for: indexPath) as! PopularCategoryCollectionViewCell
+            let recipe = presenter.popularRecipes[indexPath.item]
+            cell.configure(with: recipe)
             return cell
         case 4:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RecentViewCell", for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RecentViewCell", for: indexPath) as! RecentRecipeCollectionViewCell
+            let recipe = presenter.recentRecipes[indexPath.item]
+            cell.configure(with: recipe)
             return cell
         case 5:
-            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PopularCreatorViewCell", for: indexPath)
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "PopularCreatorViewCell", for: indexPath) as! PopularCreatorCollectionViewCell
+            let recipe = presenter.popularCreators[indexPath.item]
+            cell.configure(with: recipe)
             return cell
+            
         default:
             return UICollectionViewCell()
         }

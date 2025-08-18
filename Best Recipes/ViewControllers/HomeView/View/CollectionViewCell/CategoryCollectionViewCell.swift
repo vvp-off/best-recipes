@@ -18,8 +18,8 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
-        let labelColor = UIColor(red: 243/255.0, green: 178/255.0, blue: 178/255.0, alpha: 1.0)
+        label.font = .poppinsBold(size: 12)
+        let labelColor = UIColor(red: 243/255, green: 178/255, blue: 178/255, alpha: 1.0)
         label.textColor = labelColor
         label.numberOfLines = 0
         return label
@@ -37,8 +37,8 @@ class CategoryCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with title: String) {
-       
+    func configure(with category: String) {
+        titleLabel.text = category
     }
 }
 

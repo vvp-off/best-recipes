@@ -9,6 +9,9 @@ import UIKit
 
 class PopularCreatorCollectionViewCell: UICollectionViewCell {
     
+    private let popularCreators = ["Avatar", "Avatar1", "Avatar2", "Avatar3", "Avatar4", "Avatar5"]
+    private let popularName = ["Ify’s Kitchen", "Kathryn Murphy", "Jerome Bell", "Anna May", "Emily Carter", "Claire Bennett"]
+    
     // MARK: - UI Elements
     private let creatorImageView: UIImageView = {
         let iv = UIImageView()
@@ -20,7 +23,7 @@ class PopularCreatorCollectionViewCell: UICollectionViewCell {
     
     private let creatorNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 12, weight: .semibold)
+        label.font = .poppinsBold(size: 12)
         label.textColor = .black
         label.numberOfLines = 0
         return label
@@ -37,9 +40,18 @@ class PopularCreatorCollectionViewCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        creatorImageView.image = nil
+    }
+    
     // MARK: - Configuration
-    func configure() {
-       
+    func configure(with recipe: RecipeInfo) {
+        let nameIndex = abs(recipe.id.hashValue) % popularName.count
+        let name = popularName[nameIndex]
+        let avatar = popularCreators[nameIndex]
+        creatorNameLabel.text = name
+        creatorImageView.image = UIImage(named: avatar)
     }
 }
 
@@ -72,7 +84,7 @@ extension PopularCreatorCollectionViewCell {
             creatorNameLabel.topAnchor.constraint(equalTo: creatorImageView.bottomAnchor, constant: 16),
             creatorNameLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
             creatorNameLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
-            creatorNameLabel.heightAnchor.constraint(equalToConstant: 18)
+            creatorNameLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
         ])
     }
 }

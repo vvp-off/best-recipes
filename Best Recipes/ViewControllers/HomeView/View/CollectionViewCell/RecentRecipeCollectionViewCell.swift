@@ -20,7 +20,7 @@ class RecentRecipeCollectionViewCell: UICollectionViewCell {
     
     private let recipeNameLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 14, weight: .semibold)
+        label.font = .poppinsBold(size: 12)
         label.textColor = .black
         label.numberOfLines = 0
         return label
@@ -28,7 +28,7 @@ class RecentRecipeCollectionViewCell: UICollectionViewCell {
     
     private let authorLabel: UILabel = {
         let label = UILabel()
-        label.font = UIFont.systemFont(ofSize: 10, weight: .light)
+        label.font = .poppinsRegular(size: 12)
         label.textColor = .gray
         return label
     }()
@@ -45,8 +45,18 @@ class RecentRecipeCollectionViewCell: UICollectionViewCell {
     }
     
     // MARK: - Configuration
-    func configure(with title: String) {
-        
+    func configure(with recipe: RecipeInfo) {
+        if let imageUrl = recipe.image, let url = URL(string: imageUrl) {
+            URLSession.shared.dataTask(with: url) { data, _, _ in
+                if let data = data {
+                    DispatchQueue.main.async {
+                        self.recipeImageView.image = UIImage(data: data)
+                    }
+                }
+            }.resume()
+        }
+        recipeNameLabel.text = recipe.title
+        authorLabel.text = recipe.sourceName
     }
 }
 
@@ -73,8 +83,8 @@ extension RecentRecipeCollectionViewCell {
     func setupRecipeNameLabel() {
         contentView.addSubview(recipeNameLabel)
         recipeNameLabel.translatesAutoresizingMaskIntoConstraints = false
-        recipeNameLabel.text = "Kelewele Ghanian Recipe"
         recipeNameLabel.textAlignment = .left
+        recipeNameLabel.lineBreakMode = .byClipping
         
         NSLayoutConstraint.activate([
             recipeNameLabel.topAnchor.constraint(equalTo: recipeImageView.bottomAnchor, constant: 8),
@@ -87,9 +97,9 @@ extension RecentRecipeCollectionViewCell {
     func setupauthorLabel() {
         contentView.addSubview(authorLabel)
         authorLabel.translatesAutoresizingMaskIntoConstraints = false
-        authorLabel.text = "By Zeelicious Foods"
         authorLabel.clipsToBounds = false
-        authorLabel.baselineAdjustment = .alignCenters  
+        authorLabel.lineBreakMode = .byClipping
+        authorLabel.baselineAdjustment = .alignCenters
         authorLabel.lineBreakMode = .byTruncatingTail
         authorLabel.textAlignment = .left
         
