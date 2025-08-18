@@ -80,14 +80,20 @@ final class FavoriteViewController: UIViewController {
         }
     }
     
-    private func initData() {
+    private func initData(newData: [FavoriteCellModel] = []) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, FavoriteCellModel>()
         snapshot.appendSections([.main])
-        snapshot.appendItems([
-            FavoriteCellModel(score: 4.8, isFavorite: true, duration: 15),
-            FavoriteCellModel(score: 4.5, isFavorite: false, duration: 25),
-            FavoriteCellModel(score: 4.9, isFavorite: false, duration: 10)
-        ])
+        
+        let data = [
+            FavoriteCellModel(score: 4.8, isFavorite: true, duration: 15, title: "Tasty French Baguette", author: "Issac"),
+            FavoriteCellModel(score: 4.8, isFavorite: true, duration: 75, title: "Slow-Cooked Beef Stew", author: "Amelia"),
+            FavoriteCellModel(score: 4.6, isFavorite: false, duration: 90, title: "Traditional Paella", author: "Carlos"),
+            FavoriteCellModel(score: 4.7, isFavorite: true, duration: 120, title: "Thanksgiving Turkey Feast", author: "Sophia"),
+            FavoriteCellModel(score: 4.5, isFavorite: false, duration: 80, title: "Indian Butter Chicken", author: "Raj"),
+            FavoriteCellModel(score: 5.0, isFavorite: true, duration: 150, title: "Wedding Cake Masterpiece", author: "Emma"),
+            FavoriteCellModel(score: 4.3, isFavorite: false, duration: 95, title: "Seafood Bouillabaisse", author: "Louis")] + newData
+
+        snapshot.appendItems(data)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
     
