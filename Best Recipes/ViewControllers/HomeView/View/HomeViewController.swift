@@ -18,7 +18,7 @@ class HomeViewController: UIViewController, HomeViewProtocol {
     
     // MARK: - Properties
     var presenter: HomePresenterProtocol
-
+    
     // MARK: - Views
     private let scrollView = UIScrollView()
     private let contentView = UIView()
@@ -27,6 +27,10 @@ class HomeViewController: UIViewController, HomeViewProtocol {
     private let popularCategoryCollectionTitle = BRCollectionTitle(title: "Popular category", showSeeAll: false)
     private let recentRecipeCollectionTitle = BRCollectionTitle(title: "Recent recipe")
     private let poopularCreatorsCollectionTitle = BRCollectionTitle(title: "Popular creators")
+    
+    
+    private var isSearchMode = false
+    private var searchResults: [RecipeInfo] = []
     
     lazy var trendingCollection: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -77,6 +81,15 @@ class HomeViewController: UIViewController, HomeViewProtocol {
         return collection
     }()
     
+    private lazy var seeAllCollectionView: UICollectionView = {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .vertical
+        layout.minimumLineSpacing = 20
+        layout.minimumInteritemSpacing = 0
+        let collection = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        return collection
+    }()
+    
     // MARK: - Initializers
     init(presenter: HomePresenterProtocol) {
         self.presenter = presenter
@@ -93,34 +106,45 @@ class HomeViewController: UIViewController, HomeViewProtocol {
         super.viewDidLoad()
         view.backgroundColor = .white
         setupNavigationTitle()
+        setupSearchField()
         setupViews()
         presenter.viewDidLoad()
     }
     
+    private func setupSearchField() {
+        searchField.onTap = { [weak self] in
+            self?.activateSearchMode()
+        }
+        searchField.onCancel = { [weak self] in
+            self?.deactivateSearchMode()
+        }
+        searchField.delegate = self
+    }
+    
     // MARK: - HomeViewProtocol
-        func displayTrendingRecipes(_ recipes: [RecipeInfo]) {
-            DispatchQueue.main.async {
-                self.trendingCollection.reloadData()
-            }
+    func displayTrendingRecipes(_ recipes: [RecipeInfo]) {
+        DispatchQueue.main.async {
+            self.trendingCollection.reloadData()
         }
-        
-        func displayPopularRecipes(_ recipes: [RecipeInfo]) {
-            DispatchQueue.main.async {
-                self.popularCategoryCollection.reloadData()
-            }
+    }
+    
+    func displayPopularRecipes(_ recipes: [RecipeInfo]) {
+        DispatchQueue.main.async {
+            self.popularCategoryCollection.reloadData()
         }
-        
-        func displayRecentRecipes(_ recipes: [RecipeInfo]) {
-            DispatchQueue.main.async {
-                self.recentRecipeCollection.reloadData()
-            }
+    }
+    
+    func displayRecentRecipes(_ recipes: [RecipeInfo]) {
+        DispatchQueue.main.async {
+            self.recentRecipeCollection.reloadData()
         }
-        
-        func displayPopularCreators(_ creators: [RecipeInfo]) {
-            DispatchQueue.main.async {
-                self.popularCreatorCollection.reloadData()
-            }
+    }
+    
+    func displayPopularCreators(_ creators: [RecipeInfo]) {
+        DispatchQueue.main.async {
+            self.popularCreatorCollection.reloadData()
         }
+    }
     
     private func setupNavigationTitle() {
         navigationController?.navigationBar.prefersLargeTitles = true
@@ -131,7 +155,7 @@ class HomeViewController: UIViewController, HomeViewProtocol {
         titleLabel.font = UIFont.systemFont(ofSize: 24, weight: .bold)
         titleLabel.textColor = .black
         titleLabel.numberOfLines = 0
-            
+        
         navigationItem.titleView = titleLabel
         
         navigationController?.navigationBar.largeTitleTextAttributes = [
@@ -145,6 +169,77 @@ class HomeViewController: UIViewController, HomeViewProtocol {
                 return style
             }()
         ]
+    }
+    
+    private func activateSearchMode() {
+        isSearchMode = true
+        
+        trendingCollectionTitle.isHidden = true
+        trendingCollection.isHidden = true
+        popularCategoryCollectionTitle.isHidden = true
+        popularCategoryCollection.isHidden = true
+        categoriesCollectionView.isHidden = true
+        recentRecipeCollectionTitle.isHidden = true
+        recentRecipeCollection.isHidden = true
+        poopularCreatorsCollectionTitle.isHidden = true
+        popularCreatorCollection.isHidden = true
+        
+        seeAllCollectionView.isHidden = false
+        contentView.bringSubviewToFront(seeAllCollectionView)
+        
+        searchField.becomeFirstResponder()
+        searchField.setCancelButtonVisible(true)
+    }
+    
+    private func deactivateSearchMode() {
+        isSearchMode = false
+        searchField.text = ""
+        searchField.resignFirstResponder()
+        searchField.setCancelButtonVisible(false)
+        
+        seeAllCollectionView.isHidden = true
+        
+        trendingCollectionTitle.isHidden = false
+        trendingCollection.isHidden = false
+        popularCategoryCollectionTitle.isHidden = false
+        popularCategoryCollection.isHidden = false
+        categoriesCollectionView.isHidden = false
+        recentRecipeCollectionTitle.isHidden = false
+        recentRecipeCollection.isHidden = false
+        poopularCreatorsCollectionTitle.isHidden = false
+        popularCreatorCollection.isHidden = false
+        
+        searchResults = []
+        reloadAllCollections()
+    }
+    
+    private func performSearch(with query: String) {
+        guard !query.isEmpty else {
+            searchResults = []
+            seeAllCollectionView.reloadData()
+            return
+        }
+        
+        let queryLowercased = query.lowercased()
+        let allRecipes = presenter.trendingRecipes + presenter.popularRecipes + presenter.recentRecipes + presenter.popularCreators
+        
+        searchResults = allRecipes.filter {
+            ($0.title?.lowercased().contains(queryLowercased) ?? false) ||
+            ($0.sourceName?.lowercased().contains(queryLowercased) ?? false)
+        }
+        
+        seeAllCollectionView.reloadData()
+    }
+    
+    private func reloadAllCollections() {
+        if isSearchMode {
+            seeAllCollectionView.reloadData()
+        } else {
+            trendingCollection.reloadData()
+            popularCategoryCollection.reloadData()
+            recentRecipeCollection.reloadData()
+            popularCreatorCollection.reloadData()
+        }
     }
 }
 
@@ -163,6 +258,7 @@ extension HomeViewController {
         setupRecentRecipeCollectionView()
         setupPopularCreatorsCollectionTitle()
         setupPopularCreatorCollectionView()
+        setupSeeallCollectionView()
     }
     
     func setupScrollView() {
@@ -223,7 +319,7 @@ extension HomeViewController {
         trendingCollection.dataSource = self
         trendingCollection.showsHorizontalScrollIndicator = false
         trendingCollection.register(TrandingCollectionViewCell.self, forCellWithReuseIdentifier: "TrandingViewCell")
-    
+        
         NSLayoutConstraint.activate([
             trendingCollection.topAnchor.constraint(equalTo: trendingCollectionTitle.bottomAnchor, constant: 10),
             trendingCollection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -251,7 +347,7 @@ extension HomeViewController {
         categoriesCollectionView.dataSource = self
         categoriesCollectionView.showsHorizontalScrollIndicator = false
         categoriesCollectionView.register(CategoryCollectionViewCell.self, forCellWithReuseIdentifier: "CategoryViewCell")
-    
+        
         NSLayoutConstraint.activate([
             categoriesCollectionView.topAnchor.constraint(equalTo: popularCategoryCollectionTitle.bottomAnchor, constant: 10),
             categoriesCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -267,7 +363,7 @@ extension HomeViewController {
         popularCategoryCollection.dataSource = self
         popularCategoryCollection.showsHorizontalScrollIndicator = false
         popularCategoryCollection.register(PopularCategoryCollectionViewCell.self, forCellWithReuseIdentifier: "PopularViewCell")
-    
+        
         NSLayoutConstraint.activate([
             popularCategoryCollection.topAnchor.constraint(equalTo: categoriesCollectionView.bottomAnchor, constant: 10),
             popularCategoryCollection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -295,7 +391,7 @@ extension HomeViewController {
         recentRecipeCollection.dataSource = self
         recentRecipeCollection.showsHorizontalScrollIndicator = false
         recentRecipeCollection.register(RecentRecipeCollectionViewCell.self, forCellWithReuseIdentifier: "RecentViewCell")
-    
+        
         NSLayoutConstraint.activate([
             recentRecipeCollection.topAnchor.constraint(equalTo: recentRecipeCollectionTitle.bottomAnchor, constant: 10),
             recentRecipeCollection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -323,7 +419,7 @@ extension HomeViewController {
         popularCreatorCollection.dataSource = self
         popularCreatorCollection.showsHorizontalScrollIndicator = false
         popularCreatorCollection.register(PopularCreatorCollectionViewCell.self, forCellWithReuseIdentifier: "PopularCreatorViewCell")
-    
+        
         NSLayoutConstraint.activate([
             popularCreatorCollection.topAnchor.constraint(equalTo: poopularCreatorsCollectionTitle.bottomAnchor, constant: 10),
             popularCreatorCollection.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
@@ -332,11 +428,37 @@ extension HomeViewController {
             popularCreatorCollection.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -20)
         ])
     }
+    
+    func setupSeeallCollectionView() {
+        contentView.addSubview(seeAllCollectionView)
+        seeAllCollectionView.translatesAutoresizingMaskIntoConstraints = false
+        seeAllCollectionView.delegate = self
+        seeAllCollectionView.dataSource = self
+        seeAllCollectionView.showsHorizontalScrollIndicator = false
+        seeAllCollectionView.register(SeeAllCollectionViewCell.self, forCellWithReuseIdentifier: "SeeAllCollectionCell")
+        contentView.bringSubviewToFront(seeAllCollectionView)
+        
+        NSLayoutConstraint.activate([
+            seeAllCollectionView.topAnchor.constraint(equalTo: searchField.bottomAnchor, constant: 20),
+            seeAllCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            seeAllCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            seeAllCollectionView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
+        seeAllCollectionView.isHidden = true
+    }
 }
 
 // MARK: - CollectionView delegate
 extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        if collectionView == seeAllCollectionView {
+            return searchResults.count
+        }
+        
+        if isSearchMode {
+            return 0
+        }
+        
         switch collectionView.tag {
         case 1: return presenter.trendingRecipes.count
         case 2: return presenter.categories.count
@@ -348,6 +470,15 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        if isSearchMode && collectionView == seeAllCollectionView {
+            let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "SeeAllCollectionCell", for: indexPath) as! SeeAllCollectionViewCell
+            let recipe = searchResults[indexPath.item]
+            cell.configureCell(recipe: recipe) {
+                // Обработка действия
+            }
+            return cell
+        }
+        
         switch collectionView.tag {
         case 1:
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "TrandingViewCell", for: indexPath) as! TrandingCollectionViewCell
@@ -385,6 +516,11 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
 
 extension HomeViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        if collectionView == seeAllCollectionView {
+            let width = contentView.bounds.width - 40
+            return CGSize(width: width, height: 180)
+        }
+        
         switch collectionView.tag {
         case 1:
             return CGSize(width: 240, height: 240)
@@ -399,5 +535,20 @@ extension HomeViewController: UICollectionViewDelegateFlowLayout {
         default:
             return CGSize(width: 0, height: 0)
         }
+    }
+}
+
+extension HomeViewController: UITextFieldDelegate {
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        if let text = textField.text, let textRange = Range(range, in: text) {
+            let updatedText = text.replacingCharacters(in: textRange, with: string)
+            performSearch(with: updatedText)
+        }
+        return true
+    }
+    
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        textField.resignFirstResponder()
+        return true
     }
 }
