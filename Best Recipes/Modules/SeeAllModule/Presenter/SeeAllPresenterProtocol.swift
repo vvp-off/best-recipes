@@ -13,5 +13,6 @@ protocol SeeAllPresenterProtocol: AnyObject {
     var seeAllRecipes: [RecipeProtocol] { get set }
     
     var networkManager: NetworkManager { get set }
+    var router: MainRouterProtocol { get set }
 }
 
