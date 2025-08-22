@@ -116,11 +116,11 @@ final class RecipeDetailViewController: UIViewController {
        }()
 
     private let starImageView: UIImageView = {
-           let imageView = UIImageView()
-           imageView.translatesAutoresizingMaskIntoConstraints = false
-           imageView.image = UIImage(systemName: "star.fill")
+            let imageView = UIImageView()
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            imageView.image = UIImage(systemName: "star.fill")
             imageView.tintColor = .black
-           return imageView
+            return imageView
        }()
 
     private let ratingLabel: UILabel = {
