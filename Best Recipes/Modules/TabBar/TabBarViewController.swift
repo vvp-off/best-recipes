@@ -56,12 +56,12 @@ final class TabBarViewController: UITabBarController {
         firstVC.view.backgroundColor = .black
         let secondVC = FavoriteViewController.create() 
         secondVC.view.backgroundColor = .white
-        let thirdVC = UIViewController()
-        thirdVC.view.backgroundColor = .green
+        let thirdVC = CreateRecipeViewController()
+        thirdVC.view.backgroundColor = .white
         let forVC = UIViewController()
         forVC.view.backgroundColor = .darkGray
-        let fiveVC = UIViewController()
-        fiveVC.view.backgroundColor = .brown
+        let fiveVC = MyProfileViewController()
+        fiveVC.view.backgroundColor = .white
         let mockViewControllers = [firstVC, secondVC, thirdVC, forVC, fiveVC]
         return mockViewControllers
     }
@@ -79,7 +79,7 @@ final class TabBarViewController: UITabBarController {
                 image: UIImage(named: "TabBarItem2")),
             
             generateVC(
-                viewController: mockViewControllers[2],
+                viewController: UINavigationController(rootViewController: mockViewControllers[2]),
                 image: nil),
             
             generateVC(viewController: UINavigationController(rootViewController: mockViewControllers[3]),
