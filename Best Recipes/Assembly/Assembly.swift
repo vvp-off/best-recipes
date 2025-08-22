@@ -29,12 +29,18 @@ class Assembly: AssemblyProtocol {
     // HomeView
     func createMainModule(router: MainRouterProtocol) -> HomeViewController {
         let networkManager = NetworkManager.shared
-        let presenter = HomePresenter(networkManager: networkManager)
+        let presenter = HomePresenter(networkManager: networkManager, router: router)
         let homeVC = HomeViewController(presenter: presenter)
         
         return homeVC
     }
     
+    // Details
+    func createDetailsModule(recipe: RecipeInfo) -> RecipeDetailViewController {
+        let recipeDetailsVC = RecipeDetailViewController(recipe: recipe)
+        return recipeDetailsVC
+    }
+
     // SeeAll
     func createSeeAllModule(recipes: [RecipeProtocol], router: MainRouterProtocol, sortOrder: Endpoint.SortOrder) -> SeeAllViewController {
         let networkManager = NetworkManager.shared

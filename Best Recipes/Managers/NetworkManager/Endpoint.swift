@@ -36,14 +36,20 @@ enum Endpoint {
 extension Endpoint {
     enum SortOrder: String {
         case trendingNow
+        case popular
+        case recent
         case random
         
         var title: String {
             switch self {
             case .trendingNow:
-                return "Trending now"
+                return "Trending now 🔥"
             case .random:
                 return "Random recipe"
+            case .popular:
+                return "Popular recipes"
+            case .recent:
+                return "Recent recipes"
             }
         }
     }

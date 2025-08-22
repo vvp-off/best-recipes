@@ -13,6 +13,7 @@ class BRCollectionTitle: UIView {
     let titleLabel = UILabel()
     let seeAllButton = UIButton()
     let arrowImageView = UIImageView()
+    var onSeeAll: (() -> Void)?
 
     // MARK: - Initializers
     init(title: String, showSeeAll: Bool = true) {
@@ -66,6 +67,10 @@ private extension BRCollectionTitle {
         let spacing: CGFloat = 5
         seeAllButton.imageEdgeInsets = UIEdgeInsets(top: 0, left: spacing, bottom: 0, right: -spacing)
         seeAllButton.titleEdgeInsets = UIEdgeInsets(top: 0, left: -spacing, bottom: 0, right: spacing)
+        
+        seeAllButton.addAction(UIAction(handler: { [weak self] _ in
+            self?.onSeeAll?()
+        }), for: .touchUpInside)
         
         NSLayoutConstraint.activate([
             seeAllButton.centerYAnchor.constraint(equalTo: titleLabel.centerYAnchor),

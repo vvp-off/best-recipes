@@ -9,7 +9,7 @@ import UIKit
 
 protocol BaseRouterProtocol: AnyObject {
     var navigationController: UINavigationController { get }
-    func routeToDetailScreen(recipe: RecipeProtocol)
+    func routeToDetailScreen(recipe: RecipeInfo)
 }
 
 protocol MainRouterProtocol: BaseRouterProtocol {

@@ -104,10 +104,39 @@ class HomeViewController: UIViewController, HomeViewProtocol {
     // MARK: - Lifecyrcle
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUI()
+        bindingActions()
+        loadData()
+    }
+    
+    //MARK: Private methods
+    private func setupUI() {
         view.backgroundColor = .white
         setupNavigationTitle()
         setupSearchField()
         setupViews()
+        
+        trendingCollectionTitle.configure(title: "Trending now 🔥", showSeeAll: true)
+        popularCategoryCollectionTitle.configure(title: "Popular category", showSeeAll: true)
+        recentRecipeCollectionTitle.configure(title: "Recent recipe", showSeeAll: true)
+        
+        navigationItem.backButtonDisplayMode = .minimal
+    }
+    
+    private func bindingActions() {
+        trendingCollectionTitle.onSeeAll = { [weak self] in
+            self?.presenter.didTapSeeAllTrending()
+        }
+        
+        popularCategoryCollectionTitle.onSeeAll = { [weak self] in
+            self?.presenter.didTapSeeAllPopular()
+        }
+        recentRecipeCollectionTitle.onSeeAll = { [weak self] in
+            self?.presenter.didTapSeeAllRecent()
+        }
+    }
+    
+    private func loadData() {
         presenter.viewDidLoad()
     }
     
@@ -466,6 +495,28 @@ extension HomeViewController: UICollectionViewDelegate, UICollectionViewDataSour
         case 4: return presenter.recentRecipes.count
         case 5: return presenter.popularCreators.count
         default: return 0
+        }
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        if collectionView == seeAllCollectionView {
+            let recipe = searchResults[indexPath.item]
+            presenter.didSelectRecipe(recipe)
+            return
+        }
+        
+        guard !isSearchMode else { return }
+        switch collectionView.tag {
+        case 1:
+            presenter.didSelectRecipe(presenter.trendingRecipes[indexPath.item])
+        case 3:
+            presenter.didSelectRecipe(presenter.popularRecipes[indexPath.item])
+        case 4:
+            presenter.didSelectRecipe(presenter.recentRecipes[indexPath.item])
+        case 5:
+            presenter.didSelectRecipe(presenter.popularCreators[indexPath.item])
+        default:
+            break
         }
     }
     

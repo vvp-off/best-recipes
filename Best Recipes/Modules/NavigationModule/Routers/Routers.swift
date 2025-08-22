@@ -21,9 +21,9 @@ final class MainRouter: MainRouterProtocol {
         navigationController.viewControllers = [vc]
     }
     
-    func routeToDetailScreen(recipe: RecipeProtocol) {
-//        let recipeDetailVC = assembly.createDetailsModule(recipe: recipe)
-//        navigationController.pushViewController(recipeDetailVC, animated: true)
+    func routeToDetailScreen(recipe: RecipeInfo) {
+        let detailsVC = assembly.createDetailsModule(recipe: recipe)
+        navigationController.pushViewController(detailsVC, animated: true)
     }
     
     func routeToSeeAllScreen(recipes: [RecipeProtocol], sortOrder: Endpoint.SortOrder) {

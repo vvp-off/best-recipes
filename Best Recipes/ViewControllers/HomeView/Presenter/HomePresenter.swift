@@ -19,11 +19,16 @@ protocol HomePresenterProtocol {
     func didSelectRecipe(_ recipe: RecipeInfo)
     func didTapAddButton(for recipe: RecipeInfo)
     func didSelectCategory(_ category: String)
+    
+    func didTapSeeAllTrending()
+    func didTapSeeAllPopular()
+    func didTapSeeAllRecent()
 }
 
 class HomePresenter: HomePresenterProtocol {
     weak var view: HomeViewProtocol?
     private let networkManager: NetworkManager
+    private let router: MainRouterProtocol
     
     private(set) var trendingRecipes: [RecipeInfo] = []
     private(set) var popularRecipes: [RecipeInfo] = []
@@ -31,8 +36,9 @@ class HomePresenter: HomePresenterProtocol {
     private(set) var popularCreators: [RecipeInfo] = []
     let categories = ["Breakfast", "Lunch", "Dinner", "Dessert", "Drinks", "Snacks", "Salad", "Soup", "Vegan", "Quick"]
     
-    init(networkManager: NetworkManager) {
+    init(networkManager: NetworkManager, router: MainRouterProtocol) {
         self.networkManager = networkManager
+        self.router = router
     }
     
     func viewDidLoad() {
@@ -68,7 +74,7 @@ class HomePresenter: HomePresenterProtocol {
     }
     
     func didSelectRecipe(_ recipe: RecipeInfo) {
-        
+        router.routeToDetailScreen(recipe: recipe)
     }
     
     func didTapAddButton(for recipe: RecipeInfo) {
@@ -77,6 +83,18 @@ class HomePresenter: HomePresenterProtocol {
     
     func didSelectCategory(_ category: String) {
         
+    }
+    
+    func didTapSeeAllPopular() {
+        router.routeToSeeAllScreen(recipes: popularRecipes, sortOrder: Endpoint.SortOrder.popular)
+    }
+    
+    func didTapSeeAllRecent() {
+        router.routeToSeeAllScreen(recipes: recentRecipes, sortOrder: Endpoint.SortOrder.recent)
+    }
+    
+    func didTapSeeAllTrending() {
+        router.routeToSeeAllScreen(recipes: recentRecipes, sortOrder: Endpoint.SortOrder.trendingNow)
     }
 }
 
