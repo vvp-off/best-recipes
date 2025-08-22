@@ -153,7 +153,7 @@ final class CreateRecipeViewController: UIViewController {
     }
 
     private func setupNavigationBar() {
-        title = "Create recipe"
+        navigationController?.navigationItem.title = "Create recipe"
 
         navigationController?.setNavigationBarHidden(false, animated: false)
         navigationController?.navigationBar.prefersLargeTitles = false
