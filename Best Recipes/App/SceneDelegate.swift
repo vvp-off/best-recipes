@@ -15,18 +15,31 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowsScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowsScene)
         
-        let alreadyShown = UserDefaults.standard.bool(forKey: AppKeys.didShowOnboarding)
-        let rootVC: UIViewController = {
-            if alreadyShown {
-                return TabBarViewController()
-            } else {
-                return UINavigationController(rootViewController: StartViewController())
-            }
-        }()
+//        let alreadyShown = UserDefaults.standard.bool(forKey: AppKeys.didShowOnboarding)
+//        let rootVC: UIViewController = {
+//            if alreadyShown {
+//                return TabBarViewController()
+//            } else {
+//                return UINavigationController(rootViewController: StartViewController())
+//            }
+//        }()
         
-        window.rootViewController = rootVC
+        let assembly = Assembly()
+        let tabBar = assembly.createTabBar()
+        let mainRouter: MainRouterProtocol = assembly.createMainRouter()
+        
+        let savedRecipes = UINavigationController(rootViewController: FavoriteViewController())
+        
+        tabBar.viewControllers = [
+            mainRouter.navigationController,
+            savedRecipes,
+            UIViewController(),         //centerPlusButton
+            UIViewController(),         //search
+            UIViewController()          //profile
+        ]
+        
+        window.rootViewController = tabBar
         window.makeKeyAndVisible()
-        
         self.window = window
     }
 }

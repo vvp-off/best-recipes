@@ -10,6 +10,27 @@ import UIKit
 final class SeeAllViewController: UIViewController {
     var presenter: SeeAllPresenterProtocol!
     
+    private let headerView: UIView = {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.backgroundColor = .white
+        return $0
+    }(UIView())
+    
+    private let backButton: UIButton = {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.setImage(UIImage(resource: .arrowLeft), for: .normal)
+        $0.tintColor = .black
+        return $0
+    }(UIButton(type: .system))
+    
+    private let headerTitleLabel: UILabel = {
+        $0.translatesAutoresizingMaskIntoConstraints = false
+        $0.font = .poppinsBold(size: 22)
+        $0.textColor = .black
+        $0.textAlignment = .center
+        return $0
+    }(UILabel())
+    
     private lazy var collectionView: UICollectionView = {
         let cv = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         cv.register(SeeAllCollectionViewCell.self, forCellWithReuseIdentifier: SeeAllCollectionViewCell.reuseIdentifier)
@@ -19,25 +40,55 @@ final class SeeAllViewController: UIViewController {
         return cv
     }()
     
+    //MARK: lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
-        navigationItem.title = presenter.sortOrder.title
+        navigationController?.setNavigationBarHidden(true, animated: false)
+        headerTitleLabel.text = presenter.sortOrder.title
+        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
         setupUI()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(true, animated: animated)
         collectionView.reloadData()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+    }
+    
+    @objc private func backButtonTapped() {
+        navigationController?.popViewController(animated: true)
+    }
+    
     private func setupUI() {
+        view.addSubview(headerView)
+        headerView.addSubview(backButton)
+        headerView.addSubview(headerTitleLabel)
         view.addSubview(collectionView)
+        
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            headerView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            headerView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            headerView.heightAnchor.constraint(equalToConstant: 60),
+            
+            backButton.leadingAnchor.constraint(equalTo: headerView.leadingAnchor, constant: 16),
+            backButton.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            backButton.widthAnchor.constraint(equalToConstant: 30),
+            backButton.heightAnchor.constraint(equalToConstant: 30),
+            
+            headerTitleLabel.centerXAnchor.constraint(equalTo: headerView.centerXAnchor),
+            headerTitleLabel.centerYAnchor.constraint(equalTo: headerView.centerYAnchor),
+            
+            collectionView.topAnchor.constraint(equalTo: headerView.bottomAnchor),
             collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
         ])
     }
     
@@ -84,8 +135,10 @@ extension SeeAllViewController: UICollectionViewDataSource {
 //MARK: UICollectionViewDelegate
 extension SeeAllViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let recipe = presenter.seeAllRecipes[indexPath.item]
-        //
+        let item = presenter.seeAllRecipes[indexPath.item]
+        if let info = item as? RecipeInfo {
+            presenter.router.routeToDetailScreen(recipe: info)
+        }
     }
 }
 
