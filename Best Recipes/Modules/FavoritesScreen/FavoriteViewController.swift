@@ -26,12 +26,6 @@ final class FavoriteViewController: UIViewController {
     private var collectionView: UICollectionView!
     private var dataSource: UICollectionViewDiffableDataSource<Section, FavoriteCellModel>!
     
-    static func create() -> UIViewController {
-        let viewController = FavoriteViewController()
-        viewController.navigationItem.title = "Saved recipes"
-        return viewController
-    }
-    
     
     override func viewDidLoad() {
         super.viewDidLoad()

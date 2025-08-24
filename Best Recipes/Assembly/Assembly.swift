@@ -55,4 +55,11 @@ class Assembly: AssemblyProtocol {
         seeAllVC.presenter = presenter
         return seeAllVC
     }
+    
+    func createFavoriteModule() -> FavoriteViewController {
+        let viewController = FavoriteViewController()
+        viewController.navigationItem.title = "Saved recipes"
+        viewController.tabBarItem.image = .tabBarItem2
+        return viewController
+    }
 }
