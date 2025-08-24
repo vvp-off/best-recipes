@@ -72,9 +72,9 @@ final class FavoriteViewController: UIViewController {
         var snapshot = NSDiffableDataSourceSnapshot<Section, FavoriteCellModel>()
         snapshot.appendSections([.main])
         snapshot.appendItems([
-            FavoriteCellModel(score: 4.8, isFavorite: true, duration: 15),
-            FavoriteCellModel(score: 4.5, isFavorite: false, duration: 25),
-            FavoriteCellModel(score: 4.9, isFavorite: false, duration: 10)
+            FavoriteCellModel(score: 4.8, isFavorite: true, duration: 15+90), // Stub
+            FavoriteCellModel(score: 4.5, isFavorite: false, duration: 25+300),// Stub
+            FavoriteCellModel(score: 4.9, isFavorite: false, duration: 10+600) // Stub
         ])
         dataSource.apply(snapshot, animatingDifferences: true)
     }
@@ -116,7 +116,7 @@ private final class FavoriteCell: UICollectionViewCell {
         titleText.text = model.title
         authorImageView.image = model.authorImage
         authorLabel.text = "By \(model.author)"
-        scoreLabel.configure(ratingValue: 2)
+        scoreLabel.configure(ratingValue: model.score)
         
         
         
@@ -131,7 +131,7 @@ private final class FavoriteCell: UICollectionViewCell {
         
         
         
-        let favImage = UIImage(named: model.isFavorite ? "TabBarItem2Red" : "TabBarItem2")
+        let favImage = model.isFavorite ? UIImage.tabBarItem2Red : UIImage.tabBarItem2
         favoriteButton.setImage(favImage, for: .normal)
         favoriteButton.tintColor = model.isFavorite ? .systemRed : .systemGray
         favoriteButton.backgroundColor = .white
