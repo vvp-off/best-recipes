@@ -28,7 +28,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let tabBar = assembly.createTabBar()
         let mainRouter: MainRouterProtocol = assembly.createMainRouter()
         
-        let savedRecipes = UINavigationController(rootViewController: FavoriteViewController())
+        let savedRecipes = UINavigationController(rootViewController: assembly.createFavoriteModule())
         
         tabBar.viewControllers = [
             mainRouter.navigationController,
