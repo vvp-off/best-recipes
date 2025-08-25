@@ -201,7 +201,7 @@ final class RecipeDetailViewController: UIViewController {
         addSubview()
         setupConstraints()
         setupTableView()
-        setupActions()
+//        setupActions()
         updateUI()
     }
 
@@ -211,14 +211,6 @@ final class RecipeDetailViewController: UIViewController {
         ingredientsTableView.register(IngredientTableViewCell.self, forCellReuseIdentifier: "IngredientCell")
     }
 
-    private func setupActions() {
-        backButton.addTarget(self, action: #selector(backButtonTapped), for: .touchUpInside)
-    }
-
-    @objc
-    private func backButtonTapped() {
-        navigationController?.popViewController(animated: true)
-    }
     
     private func updateUI() {
         

@@ -62,4 +62,25 @@ class Assembly: AssemblyProtocol {
         viewController.tabBarItem.image = .tabBarItem2
         return viewController
     }
+
+    func createRecipeModule() -> CreateRecipeViewController {
+        let viewController = CreateRecipeViewController()
+
+        viewController.navigationItem.title = "Create recipe"
+        
+        return viewController
+    }
+    
+    
+    func myProfileModule() -> MyProfileViewController {
+        let viewController = MyProfileViewController()
+        let presenter = MyProfilePresenter(view: viewController)
+        
+        viewController.presenter = presenter
+        viewController.navigationItem.title = "My Profile"
+        viewController.tabBarItem.image = .tabBarItem4
+        
+        return viewController
+    }
+    
 }

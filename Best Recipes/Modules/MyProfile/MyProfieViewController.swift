@@ -25,16 +25,9 @@ final class MyProfileViewController: UIViewController {
         }
     }
 
-    private var recipes: [RecipeInfo] = []
 
-    init() {
-        super.init(nibName: nil, bundle: nil)
-        loadRecipesFromUserDefaults()
-    }
+    var presenter: MyProfilePresenterProtocol!
 
-    required init?(coder: NSCoder) {
-        fatalError("init(coder:) has not been implemented")
-    }
 
     private let headerView: UIView = {
         let view = UIView()
@@ -113,6 +106,7 @@ final class MyProfileViewController: UIViewController {
         return label
     }()
 
+
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -121,26 +115,90 @@ final class MyProfileViewController: UIViewController {
 
         addSubview()
         setupConstraints()
-        updateUI()
-
         setupProfileImageTap()
         setupSwipeToDelete()
+        
+        presenter.viewDidLoad()
     }
 
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        loadRecipesFromUserDefaults()
-        updateUI()
+        presenter.viewWillAppear()
     }
-}
 
-private extension MyProfileViewController {
-    func setupProfileImageTap() {
+
+    private func setupProfileImageTap() {
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(changeProfileImage))
         profileImageView.addGestureRecognizer(tapGesture)
     }
 
-    @objc func changeProfileImage() {
+    @objc private func changeProfileImage() {
+        presenter.changeProfileImage()
+    }
+
+    private func setupSwipeToDelete() {
+        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
+        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeLeft(_:)))
+        swipeLeftGesture.direction = .left
+
+        recipesCollectionView.addGestureRecognizer(longPressGesture)
+        recipesCollectionView.addGestureRecognizer(swipeLeftGesture)
+    }
+
+    @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
+        let point = gesture.location(in: recipesCollectionView)
+
+        switch gesture.state {
+        case .began:
+            guard let indexPath = recipesCollectionView.indexPathForItem(at: point) else { return }
+            presenter.deleteRecipe(at: indexPath.item)
+        default:
+            break
+        }
+    }
+
+    @objc private func handleSwipeLeft(_ gesture: UISwipeGestureRecognizer) {
+        let point = gesture.location(in: recipesCollectionView)
+        guard let indexPath = recipesCollectionView.indexPathForItem(at: point) else { return }
+        presenter.deleteRecipe(at: indexPath.item)
+    }
+}
+
+
+extension MyProfileViewController: MyProfileViewProtocol {
+    func updateUI() {
+        recipesCollectionView.reloadData()
+        updateEmptyState()
+        updateCollectionViewHeight()
+    }
+
+    func updateEmptyState() {
+        let isEmpty = presenter.isEmpty()
+        emptyStateLabel.isHidden = !isEmpty
+        recipesCollectionView.isHidden = isEmpty
+    }
+
+    func updateCollectionViewHeight() {
+        let rowCount = max(1, presenter.getRecipesCount())
+        let totalHeight = CGFloat(rowCount) * Layout.CollectionView.cellHeight + CGFloat(max(0, rowCount - 1)) * 16
+        let minHeight: CGFloat = 200
+        
+        recipesCollectionView.constraints.forEach { constraint in
+            if constraint.firstAttribute == .height {
+                constraint.constant = max(totalHeight, minHeight)
+            }
+        }
+        view.layoutIfNeeded()
+    }
+
+    func removeRecipe(at index: Int) {
+        let indexPath = IndexPath(item: index, section: 0)
+        recipesCollectionView.performBatchUpdates({
+            recipesCollectionView.deleteItems(at: [indexPath])
+        }, completion: nil)
+    }
+
+    func showImagePickerAlert() {
         let alert = UIAlertController(
             title: "Выберите фото профиля",
             message: nil,
@@ -152,7 +210,7 @@ private extension MyProfileViewController {
                 title: "Камера",
                 style: .default,
                 handler: { _ in
-                    self.openImagePicker(sourceType: .camera)
+                    self.presenter.presentImagePicker(sourceType: .camera)
                 })
         )
         
@@ -161,7 +219,7 @@ private extension MyProfileViewController {
                 title: "Галерея",
                 style: .default,
                 handler: { _ in
-                    self.openImagePicker(sourceType: .photoLibrary)
+                    self.presenter.presentImagePicker(sourceType: .photoLibrary)
                 })
         )
         
@@ -176,7 +234,7 @@ private extension MyProfileViewController {
         present(alert, animated: true)
     }
 
-    func openImagePicker(sourceType: UIImagePickerController.SourceType) {
+    func presentImagePicker(sourceType: UIImagePickerController.SourceType) {
         guard UIImagePickerController.isSourceTypeAvailable(sourceType) else { return }
         let picker = UIImagePickerController()
         picker.delegate = self
@@ -184,150 +242,62 @@ private extension MyProfileViewController {
         picker.allowsEditing = true
         present(picker, animated: true)
     }
-}
 
-private extension MyProfileViewController {
-    func loadRecipesFromUserDefaults() {
-        guard let data = UserDefaults.standard.data(forKey: "savedRecipes") else {
-            recipes = []
-            return
-        }
-
-        do {
-            recipes = try JSONDecoder().decode([RecipeInfo].self, from: data)
-            recipes.forEach { recipe in
-                print("   - \(recipe.title ?? "Без названия") (ID: \(recipe.id))")
-            }
-        } catch {
-            print("Ошибка загрузки рецептов из UserDefaults: \(error)")
-            recipes = []
-        }
+    func updateProfileImage(_ image: UIImage) {
+        profileImageView.image = image
     }
 
-    func saveRecipesToUserDefaults() {
-        do {
-            let data = try JSONEncoder().encode(recipes)
-            UserDefaults.standard.set(data, forKey: "savedRecipes")
-            print("Сохранено \(recipes.count) рецептов в UserDefaults")
-        } catch {
-            print("Ошибка сохранения рецептов в UserDefaults: \(error)")
-        }
-    }
-
-    func updateUI() {
-        recipesCollectionView.reloadData()
-        updateEmptyState()
-        updateCollectionViewHeight()
-    }
-
-    func updateEmptyState() {
-        emptyStateLabel.isHidden = !recipes.isEmpty
-        recipesCollectionView.isHidden = recipes.isEmpty
-    }
-
-    func updateCollectionViewHeight() {
-        let rowCount = max(1, recipes.count)
-        let totalHeight = CGFloat(rowCount) * Layout.CollectionView.cellHeight + CGFloat(max(0, rowCount - 1)) * 16
-        let minHeight: CGFloat = 200
-        
-        recipesCollectionView.constraints.forEach { constraint in
-            if constraint.firstAttribute == .height {
-                constraint.constant = max(totalHeight, minHeight)
-            }
-        }
-        view.layoutIfNeeded()
-    }
-}
-
-private extension MyProfileViewController {
-    func setupSwipeToDelete() {
-        let longPressGesture = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-        let swipeLeftGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeLeft(_:)))
-        swipeLeftGesture.direction = .left
-
-        recipesCollectionView.addGestureRecognizer(longPressGesture)
-        recipesCollectionView.addGestureRecognizer(swipeLeftGesture)
-    }
-
-    @objc func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-        let point = gesture.location(in: recipesCollectionView)
-
-        switch gesture.state {
-        case .began:
-            guard let indexPath = recipesCollectionView.indexPathForItem(at: point) else { return }
-            showDeleteConfirmation(for: indexPath)
-        default:
-            break
-        }
-    }
-
-    @objc func handleSwipeLeft(_ gesture: UISwipeGestureRecognizer) {
-        let point = gesture.location(in: recipesCollectionView)
-        guard let indexPath = recipesCollectionView.indexPathForItem(at: point) else { return }
-        showDeleteConfirmation(for: indexPath)
-    }
-
-    func showDeleteConfirmation(for indexPath: IndexPath) {
-        let recipe = recipes[indexPath.item]
+    func showDeleteConfirmation(
+        recipeName: String,
+        at index: Int,
+        completion: @escaping () -> Void
+    ) {
         let alert = UIAlertController(
             title: "Удалить рецепт",
-            message: "Вы уверены, что хотите удалить рецепт \"\(recipe.title ?? "Без названия")\"?",
+            message: "Вы уверены, что хотите удалить рецепт \"\(recipeName)\"?",
             preferredStyle: .alert
         )
 
         alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { [weak self] _ in
-            self?.deleteRecipe(at: indexPath)
+        alert.addAction(UIAlertAction(title: "Удалить", style: .destructive) { _ in
+            completion()
         })
 
         present(alert, animated: true)
     }
-
-    func deleteRecipe(at indexPath: IndexPath) {
-
-        recipes.remove(at: indexPath.item)
-        saveRecipesToUserDefaults()
-        recipesCollectionView.performBatchUpdates({
-            recipesCollectionView.deleteItems(at: [indexPath])
-        }) { [weak self] _ in
-            self?.updateUI()
-        }
-    }
 }
 
 // MARK: - UIImagePickerControllerDelegate
-
 extension MyProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController,
                                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
         
         if let editedImage = info[.editedImage] as? UIImage {
-            profileImageView.image = editedImage
+            presenter.updateProfileImage(editedImage)
         } else if let originalImage = info[.originalImage] as? UIImage {
-            profileImageView.image = originalImage
+            presenter.updateProfileImage(originalImage)
         }
     }
 }
 
 // MARK: - UICollectionViewDataSource
-
 extension MyProfileViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return recipes.count
+        return presenter.getRecipesCount()
     }
 
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RecipeCardCell", for: indexPath) as? RecipeCardCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "RecipeCardCell", for: indexPath) as? RecipeCardCell,
+              let recipe = presenter.getRecipe(at: indexPath.item) else {
             return UICollectionViewCell()
         }
-        cell.configure(with: recipes[indexPath.item])
+        cell.configure(with: recipe)
         return cell
     }
 }
 
 // MARK: - UICollectionViewDelegateFlowLayout
-
 extension MyProfileViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(
         _ collectionView: UICollectionView,
@@ -340,7 +310,6 @@ extension MyProfileViewController: UICollectionViewDelegateFlowLayout {
 }
 
 // MARK: - Setup Constraints
-
 private extension MyProfileViewController {
     func addSubview() {
         view.addSubview(headerView)

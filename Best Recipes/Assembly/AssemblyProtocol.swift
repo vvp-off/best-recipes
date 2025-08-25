@@ -17,6 +17,8 @@ protocol MainScreenAssembly {
     func createSeeAllModule(recipes: [RecipeProtocol], router: MainRouterProtocol, sortOrder: Endpoint.SortOrder) -> SeeAllViewController
     func createDetailsModule(recipe: RecipeInfo) -> RecipeDetailViewController
     func createFavoriteModule() -> FavoriteViewController
+    func createRecipeModule() -> CreateRecipeViewController
+    func myProfileModule() -> MyProfileViewController
 }
 
 typealias AssemblyProtocol = RootAssembly & MainScreenAssembly

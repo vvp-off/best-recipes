@@ -14,6 +14,8 @@ final class CreateRecipeViewController: UIViewController {
         static let createButtonHeight: CGFloat = 50
     }
 
+    var presenter: CreateRecipePresenterProtocol!
+
     private let servesRow = InfoRow(icon: UIImage(resource: .iconServes), title: "Serves", value: "03")
     private let timeRow = InfoRow(icon: UIImage(resource: .iconServesClock), title: "Cook time", value: "20 min")
 
@@ -128,6 +130,7 @@ final class CreateRecipeViewController: UIViewController {
         return createButton
     }()
 
+    // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -136,21 +139,15 @@ final class CreateRecipeViewController: UIViewController {
         addSubviews()
         setupConstraints()
         setupIngredients()
+        setupRowTapGestures()
         instructionsTextView.delegate = self
-
-        servesRow.addTapGesture { [weak self] in
-            self?.showServesSelector()
-        }
-
-        timeRow.addTapGesture { [weak self] in
-            self?.showTimeSelector()
-        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         navigationController?.setNavigationBarHidden(false, animated: animated)
     }
+
 
     private func setupNavigationBar() {
         navigationController?.navigationItem.title = "Create recipe"
@@ -162,114 +159,47 @@ final class CreateRecipeViewController: UIViewController {
             image: UIImage(resource: .arrowLeft),
             style: .plain,
             target: self,
-            action: #selector(didTapBack)
+            action: nil
         )
-        backButton.tintColor = .black
-        navigationItem.leftBarButtonItem = backButton
-    }
-        
-    @objc private func didTapBack() {
-        navigationController?.popViewController(animated: true)
     }
 
-    @objc private func didTapChangeImage() {
-        let alert = UIAlertController(
-            title: "Сменить изображение",
-            message: "Выберите способ смены изображения",
-            preferredStyle: .actionSheet
-        )
-        
-        alert.addAction(UIAlertAction(title: "Камера", style: .default) { _ in
-            self.presentImagePicker(sourceType: .camera)
-        })
-        
-        alert.addAction(UIAlertAction(title: "Галерея", style: .default) { _ in
-            self.presentImagePicker(sourceType: .photoLibrary)
-        })
-        
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-        present(alert, animated: true)
-    }
-
-    private func showServesSelector() {
-        let alert = UIAlertController(
-            title: "Количество порций",
-            message: "Выберите количество порций",
-            preferredStyle: .actionSheet
-        )
-        
-        for serves in [1, 2, 3, 4, 5, 6, 8, 10, 12] {
-            alert.addAction(UIAlertAction(title: "\(serves)", style: .default) { _ in
-                self.servesRow.updateValue(String(format: "%02d", serves))
-            })
+    private func setupRowTapGestures() {
+        servesRow.addTapGesture { [weak self] in
+            self?.presenter.showServesSelector()
         }
 
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-
-        present(alert, animated: true)
-    }
-
-    private func showTimeSelector() {
-        let alert = UIAlertController(title: "Время приготовления", message: "Выберите время приготовления", preferredStyle: .actionSheet)
-        
-        let times = [
-            (10, "10 min"), (15, "15 min"), (20, "20 min"), (25, "25 min"), (30, "30 min"),
-            (45, "45 min"), (60, "1 час"), (90, "1.5 часа"), (120, "2 часа"), (180, "3 часа")
-        ]
-
-        for (minutes, title) in times {
-            alert.addAction(UIAlertAction(title: title, style: .default) { _ in
-                self.timeRow.updateValue(title)
-            })
+        timeRow.addTapGesture { [weak self] in
+            self?.presenter.showTimeSelector()
         }
-
-        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
-
-        present(alert, animated: true)
-    }
-
-    @objc private func didTapCreateRecipe() {
-        guard let title = titleField.text, !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            showAlert(title: "Ошибка", message: "Введите название рецепта")
-            return
-        }
-
-        let ingredients = collectIngredients()
-        guard !ingredients.isEmpty else {
-            showAlert(title: "Ошибка", message: "Добавьте хотя бы один ингредиент")
-            return
-        }
-
-        let instructions = instructionsTextView.textColor == .placeholderText ? "" : instructionsTextView.text ?? ""
-        guard !instructions.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
-            showAlert(title: "Ошибка", message: "Добавьте инструкции приготовления")
-            return
-        }
-
-        let recipe = createRecipeInfo(title: title, ingredients: ingredients, instructions: instructions)
-        saveRecipe(recipe)
-
-        showAlert(title: "Готово", message: "Рецепт успешно сохранен") { [weak self] in
-            self?.clearAllFields()
-            self?.navigationController?.popViewController(animated: true)
-        }
-    }
-
-    private func presentImagePicker(sourceType: UIImagePickerController.SourceType) {
-        guard UIImagePickerController.isSourceTypeAvailable(sourceType) else { return }
-
-        let picker = UIImagePickerController()
-        picker.sourceType = sourceType
-        picker.delegate = self
-        picker.allowsEditing = true
-
-        present(picker, animated: true)
     }
 
     private func setupIngredients() {
         addIngredient(name: "Pasta", quantity: "250gr")
         addNewIngredientRow()
     }
+
+    // MARK: - Actions
+
+    @objc private func didTapChangeImage() {
+        presenter.showImagePicker()
+    }
+
+    @objc private func didTapCreateRecipe() {
+        let ingredients = collectIngredients()
+        let serves = Int(servesRow.getValue()) ?? 1
+        let cookTime = extractTimeValue(from: timeRow.getValue())
+        let instructions = instructionsTextView.textColor == .placeholderText ? "" : instructionsTextView.text ?? ""
+        
+        presenter.createRecipe(
+            title: titleField.text ?? "",
+            image: imageView.image != UIImage(resource: .media) ? imageView.image : nil,
+            serves: serves,
+            cookTime: cookTime,
+            ingredients: ingredients,
+            instructions: instructions
+        )
+    }
+
 
     private func addIngredient(name: String, quantity: String) {
         let row = IngredientRow(name: name, quantity: quantity) { [weak self] row in
@@ -288,7 +218,116 @@ final class CreateRecipeViewController: UIViewController {
         ingredientsStack.addArrangedSubview(newRow)
     }
 
-    private func collectIngredients() -> [ExtendedIngredient] {
+
+    private func extractTimeValue(from timeString: String) -> Int {
+        let numbers = timeString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
+        return Int(numbers) ?? 30
+    }
+}
+
+
+extension CreateRecipeViewController: CreateRecipeViewProtocol {
+    func showAlert(title: String, message: String) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+    
+    func showSuccessAlert(completion: @escaping () -> Void) {
+        let alert = UIAlertController(title: "Готово", message: "Рецепт успешно сохранен", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            completion()
+        })
+        present(alert, animated: true)
+    }
+    
+    func presentImagePickerAlert() {
+        let alert = UIAlertController(
+            title: "Сменить изображение",
+            message: "Выберите способ смены изображения",
+            preferredStyle: .actionSheet
+        )
+        
+        alert.addAction(UIAlertAction(title: "Камера", style: .default) { _ in
+            self.presentImagePicker(sourceType: .camera)
+        })
+        
+        alert.addAction(UIAlertAction(title: "Галерея", style: .default) { _ in
+            self.presentImagePicker(sourceType: .photoLibrary)
+        })
+        
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        present(alert, animated: true)
+    }
+    
+    func presentImagePicker(sourceType: UIImagePickerController.SourceType) {
+        guard UIImagePickerController.isSourceTypeAvailable(sourceType) else { return }
+
+        let picker = UIImagePickerController()
+        picker.sourceType = sourceType
+        picker.delegate = self
+        picker.allowsEditing = true
+
+        present(picker, animated: true)
+    }
+    
+    func presentServesSelector(options: [Int], completion: @escaping (Int) -> Void) {
+        let alert = UIAlertController(
+            title: "Количество порций",
+            message: "Выберите количество порций",
+            preferredStyle: .actionSheet
+        )
+        
+        for serves in options {
+            alert.addAction(UIAlertAction(title: "\(serves)", style: .default) { _ in
+                completion(serves)
+            })
+        }
+
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        present(alert, animated: true)
+    }
+    
+    func presentTimeSelector(options: [(Int, String)], completion: @escaping (String) -> Void) {
+        let alert = UIAlertController(
+            title: "Время приготовления",
+            message: "Выберите время приготовления",
+            preferredStyle: .actionSheet
+        )
+        
+        for (_, title) in options {
+            alert.addAction(UIAlertAction(title: title, style: .default) { _ in
+                completion(title)
+            })
+        }
+
+        alert.addAction(UIAlertAction(title: "Отмена", style: .cancel))
+        present(alert, animated: true)
+    }
+    
+    func updateServesValue(_ serves: Int) {
+        servesRow.updateValue(String(format: "%02d", serves))
+    }
+    
+    func updateTimeValue(_ timeString: String) {
+        timeRow.updateValue(timeString)
+    }
+    
+    func clearAllFields() {
+        titleField.text = ""
+        imageView.image = UIImage(resource: .media)
+        servesRow.updateValue("03")
+        timeRow.updateValue("20 min")
+        instructionsTextView.text = "Write cooking instructions..."
+        instructionsTextView.textColor = .placeholderText
+
+        for view in ingredientsStack.arrangedSubviews {
+            view.removeFromSuperview()
+        }
+        addNewIngredientRow()
+    }
+    
+    func collectIngredients() -> [ExtendedIngredient] {
         var ingredients: [ExtendedIngredient] = []
         
         for view in ingredientsStack.arrangedSubviews {
@@ -308,103 +347,9 @@ final class CreateRecipeViewController: UIViewController {
         
         return ingredients
     }
-
-    private func createRecipeInfo(title: String, ingredients: [ExtendedIngredient], instructions: String) -> RecipeInfo {
-        let servings = Int(servesRow.getValue()) ?? 1
-        let cookTime = extractTimeValue(from: timeRow.getValue())
-
-        var imagePath: String?
-        if let image = imageView.image, image != UIImage(resource: .media) {
-            imagePath = saveImageToDocuments(image: image)
-        }
-
-        let steps = [AnalyzedInstruction.Step(number: 1, step: instructions)]
-        let analyzedInstructions = [AnalyzedInstruction(name: "Cooking", steps: steps)]
-
-        return RecipeInfo(
-            id: Int.random(in: 100000...999999),
-            title: title,
-            image: imagePath,
-            readyInMinutes: cookTime,
-            servings: servings,
-            aggregateLikes: 0,
-            sourceName: "My Recipe",
-            dishTypes: ["custom"],
-            analyzedInstructions: analyzedInstructions,
-            extendedIngredients: ingredients
-        )
-    }
-
-    private func extractTimeValue(from timeString: String) -> Int {
-        let numbers = timeString.components(separatedBy: CharacterSet.decimalDigits.inverted).joined()
-        return Int(numbers) ?? 30
-    }
-
-    private func saveImageToDocuments(image: UIImage) -> String? {
-        guard let imageData = image.jpegData(compressionQuality: 0.8) else {
-            print("Не удалось конвертировать изображение в JPEG")
-            return nil
-        }
-
-        let fileName = "recipe_\(UUID().uuidString).jpg"
-        let documentsPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
-        let imagePath = documentsPath.appendingPathComponent(fileName)
-
-        do {
-            try imageData.write(to: imagePath)
-            return fileName
-        } catch {
-            return nil
-        }
-    }
-
-    private func saveRecipe(_ recipe: RecipeInfo) {
-        var savedRecipes = getSavedRecipes()
-        savedRecipes.append(recipe)
-        
-        do {
-            let data = try JSONEncoder().encode(savedRecipes)
-            UserDefaults.standard.set(data, forKey: "savedRecipes")
-        } catch {
-        }
-    }
-
-    private func getSavedRecipes() -> [RecipeInfo] {
-        guard let data = UserDefaults.standard.data(forKey: "savedRecipes") else { return [] }
-        
-        do {
-            return try JSONDecoder().decode([RecipeInfo].self, from: data)
-        } catch {
-            return []
-        }
-    }
-
-    private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
-            completion?()
-        })
-        present(alert, animated: true)
-    }
-
-    private func clearAllFields() {
-
-        titleField.text = ""
-        imageView.image = UIImage(resource: .media)
-        servesRow.updateValue("03")
-        timeRow.updateValue("20 min")
-        instructionsTextView.text = "Write cooking instructions..."
-        instructionsTextView.textColor = .placeholderText
-
-        for view in ingredientsStack.arrangedSubviews {
-            view.removeFromSuperview()
-        }
-        addNewIngredientRow()
-    }
 }
 
 // MARK: - UIImagePickerControllerDelegate
-
 extension CreateRecipeViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         picker.dismiss(animated: true)
@@ -414,13 +359,13 @@ extension CreateRecipeViewController: UIImagePickerControllerDelegate, UINavigat
             imageView.image = originalImage
         }
     }
+    
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true)
     }
 }
 
 // MARK: - UITextViewDelegate
-
 extension CreateRecipeViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
         if textView.textColor == .placeholderText {
@@ -438,7 +383,6 @@ extension CreateRecipeViewController: UITextViewDelegate {
 }
 
 // MARK: - SetupConstraints
-
 private extension CreateRecipeViewController {
     func addSubviews() {
         view.addSubview(scrollView)
@@ -458,8 +402,7 @@ private extension CreateRecipeViewController {
     }
 
     func setupConstraints() {
-        NSLayoutConstraint.activate(
-            [
+        NSLayoutConstraint.activate([
             scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),

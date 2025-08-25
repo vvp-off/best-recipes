@@ -56,12 +56,10 @@ final class TabBarViewController: UITabBarController {
         firstVC.view.backgroundColor = .black
         let secondVC = Assembly().createFavoriteModule()
         secondVC.view.backgroundColor = .white
-        let thirdVC = CreateRecipeViewController()
-        thirdVC.view.backgroundColor = .white
+        let thirdVC = Assembly().createRecipeModule()
         let forVC = UIViewController()
         forVC.view.backgroundColor = .darkGray
-        let fiveVC = MyProfileViewController()
-        fiveVC.view.backgroundColor = .white
+        let fiveVC = Assembly().myProfileModule()
         let mockViewControllers = [firstVC, secondVC, thirdVC, forVC, fiveVC]
         return mockViewControllers
     }
