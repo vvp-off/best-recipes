@@ -204,6 +204,10 @@ final class RecipeDetailViewController: UIViewController {
         setupActions()
         updateUI()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.setNavigationBarHidden(true, animated: false)
+    }
 
     private func setupTableView() {
         ingredientsTableView.delegate = self

@@ -11,7 +11,7 @@ struct API {
     static let scheme = "https"
     static let host = "api.spoonacular.com"
     
-    static let apiKey = "b821e4a7f8994005a548a8fdb64ffafd"
+    static let apiKey = "b63d2d498e0a49968fea512540d3f547"
     
     /*
      7a82c73be7e74a38afde78b10afb2ae8
