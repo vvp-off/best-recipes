@@ -27,21 +27,43 @@ final class TabBarViewController: UITabBarController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        object_setClass(self.tabBar, CustomHeightTabBar.self)
+        setupTabBarBackground()
         generateTabBar()
         setupCenterButton()
-        addTabBarShadow()
+    }
+    
+//  MARK: - TabBarBackground setup and format
+    private func setupTabBarBackground() {
+        tabBar.backgroundImage = UIImage()
+            tabBar.shadowImage = UIImage()
+            tabBar.backgroundColor = .clear
+            
+            let backgroundImage = UIImage(named: "Bg")
+            let imageView = UIImageView(image: backgroundImage)
+            imageView.contentMode = .scaleToFill
+            
+            imageView.translatesAutoresizingMaskIntoConstraints = false
+            tabBar.insertSubview(imageView, at: 0)
+            
+            NSLayoutConstraint.activate([
+                imageView.leadingAnchor.constraint(equalTo: tabBar.leadingAnchor),
+                imageView.trailingAnchor.constraint(equalTo: tabBar.trailingAnchor),
+                imageView.topAnchor.constraint(equalTo: tabBar.topAnchor),
+                imageView.bottomAnchor.constraint(equalTo: tabBar.bottomAnchor)
+            ])
     }
     
 //  MARK: - CenterButton setup and format
         private func setupCenterButton() {
             centerButton.translatesAutoresizingMaskIntoConstraints = false
-            tabBar.addSubview(centerButton)
+            view.addSubview(centerButton)
             
             NSLayoutConstraint.activate([
                 centerButton.heightAnchor.constraint(equalToConstant: 54),
                 centerButton.widthAnchor.constraint(equalToConstant: 54),
                 centerButton.centerXAnchor.constraint(equalTo: tabBar.centerXAnchor),
-                centerButton.topAnchor.constraint(equalTo: tabBar.topAnchor, constant: -30)
+                centerButton.topAnchor.constraint(equalTo: tabBar.topAnchor, constant: -10)
             ])
         }
         
@@ -96,19 +118,6 @@ final class TabBarViewController: UITabBarController {
         viewController.tabBarItem.image = image
         return viewController
     }
-//  MARK: - Setting TabBar
-    private func addTabBarShadow() {
-        tabBar.layer.shadowColor = UIColor.gray.cgColor
-        tabBar.layer.shadowRadius = 20
-        tabBar.layer.masksToBounds = false
-        tabBar.layer.shadowOpacity = 0.10
-        tabBar.layer.shadowOffset = CGSize(width: 0, height: -2)
-        let appearance = UITabBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.shadowColor = .white
-        self.tabBar.standardAppearance = appearance
-        self.tabBar.scrollEdgeAppearance = appearance
-    }
 }
 
 //  MARK: - UITabBarControllerDelegate
@@ -118,3 +127,10 @@ extension TabBarViewController: UITabBarControllerDelegate {
         }
     }
 
+class CustomHeightTabBar: UITabBar {
+    override func sizeThatFits(_ size: CGSize) -> CGSize {
+        var sizeThatFits = super.sizeThatFits(size)
+        sizeThatFits.height = 120
+        return sizeThatFits
+    }
+}
