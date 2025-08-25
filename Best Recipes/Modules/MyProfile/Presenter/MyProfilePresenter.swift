@@ -2,7 +2,7 @@
 //  MyProfilePresenter.swift
 //  Best Recipes
 //
-//  Created by Иван Семенов on 25.08.2025.
+//  Created by Мария Родионова on 25.08.2025.
 //
 
 import Foundation

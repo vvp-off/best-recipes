@@ -2,15 +2,15 @@
 //  CreateRecipePresenterProtocol.swift
 //  Best Recipes
 //
-//  Created by Иван Семенов on 25.08.2025.
+//  Created by Мария Родионова on 25.08.2025.
 //
+
 
 import Foundation
 import UIKit
 
 protocol CreateRecipePresenterProtocol: AnyObject {
     var view: CreateRecipeViewProtocol? { get set }
-    var router: MainRouterProtocol { get set }
     
     // Recipe creation methods
     func createRecipe(
@@ -28,14 +28,11 @@ protocol CreateRecipePresenterProtocol: AnyObject {
         instructions: String
     ) -> Bool
     
-    // Image handling
+
     func showImagePicker()
     func saveImage(_ image: UIImage) -> String?
     
-    // Selection handlers
+
     func showServesSelector()
     func showTimeSelector()
-    
-    // Navigation
-    func goBack()
 }

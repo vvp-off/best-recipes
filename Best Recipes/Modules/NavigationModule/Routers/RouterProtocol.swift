@@ -22,4 +22,6 @@ protocol SavedRecipesRouterProtocol: BaseRouterProtocol { }
 
 protocol ProfileRouterProtocol: BaseRouterProtocol { }
 
-protocol CreateRouterProtocol: BaseRouterProtocol { }
+protocol CreateRecipeRouterProtocol: AnyObject {
+    var navigationController: UINavigationController { get }
+}

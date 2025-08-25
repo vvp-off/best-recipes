@@ -10,14 +10,13 @@ import UIKit
 
 class CreateRecipePresenter: CreateRecipePresenterProtocol {
     weak var view: CreateRecipeViewProtocol?
-    var router: MainRouterProtocol
+   
     
     init(
         view: CreateRecipeViewProtocol,
         router: MainRouterProtocol
     ) {
         self.view = view
-        self.router = router
     }
     
     // MARK: - Recipe Creation
@@ -46,7 +45,7 @@ class CreateRecipePresenter: CreateRecipePresenterProtocol {
         saveRecipe(recipe)
         view?.showSuccessAlert {
             self.view?.clearAllFields()
-            self.router.popViewController()
+           
         }
     }
     
@@ -111,9 +110,7 @@ class CreateRecipePresenter: CreateRecipePresenterProtocol {
         }
     }
     
-    func goBack() {
-        router.popViewController()
-    }
+   
     
     // MARK: - Private Methods
     

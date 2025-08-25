@@ -30,12 +30,16 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         let savedRecipes = UINavigationController(rootViewController: assembly.createFavoriteModule())
         
+        let createRecipes = UINavigationController(rootViewController: assembly.createRecipeModule())
+        
+        let myProfile = UINavigationController(rootViewController: assembly.myProfileModule())
+
         tabBar.viewControllers = [
             mainRouter.navigationController,
             savedRecipes,
-            UIViewController(),         //centerPlusButton
+            createRecipes,
             UIViewController(),         //search
-            UIViewController()          //profile
+            myProfile
         ]
         
         window.rootViewController = tabBar
