@@ -15,15 +15,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowsScene = (scene as? UIWindowScene) else { return }
         let window = UIWindow(windowScene: windowsScene)
         
-//        let alreadyShown = UserDefaults.standard.bool(forKey: AppKeys.didShowOnboarding)
-//        let rootVC: UIViewController = {
-//            if alreadyShown {
-//                return TabBarViewController()
-//            } else {
-//                return UINavigationController(rootViewController: StartViewController())
-//            }
-//        }()
-        
         let assembly = Assembly()
         let tabBar = assembly.createTabBar()
         let mainRouter: MainRouterProtocol = assembly.createMainRouter()
@@ -31,7 +22,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let savedRecipes = UINavigationController(rootViewController: assembly.createFavoriteModule())
         let createRecipes = UINavigationController(rootViewController: assembly.createRecipeModule())
         let myProfile = UINavigationController(rootViewController: assembly.myProfileModule())
-        
         let mockVC = UIViewController()
         mockVC.tabBarItem.image = UIImage(named: "TabBarItem3")
 
@@ -39,11 +29,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             mainRouter.navigationController,
             savedRecipes,
             createRecipes,
-            mockVC,         //search
+            mockVC,
             myProfile
         ]
         
-        window.rootViewController = tabBar
+        let alreadyShown = UserDefaults.standard.bool(forKey: AppKeys.didShowOnboarding)
+        let rootVC: UIViewController = {
+            if alreadyShown {
+                return tabBar
+            } else {
+                return UINavigationController(rootViewController: StartViewController())
+            }
+        }()
+        
+        window.rootViewController = rootVC
         window.makeKeyAndVisible()
         self.window = window
     }

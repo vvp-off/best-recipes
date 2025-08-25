@@ -197,8 +197,26 @@ final class OnboardingViewController: UIViewController {
     private func finishOnboarding() {
         UserDefaults.standard.set(true, forKey: AppKeys.didShowOnboarding)
         
-        let tab = TabBarViewController()
-        let nav = UINavigationController(rootViewController: tab)
+        let assembly = Assembly()
+        let tabBar = assembly.createTabBar()
+        let mainRouter: MainRouterProtocol = assembly.createMainRouter()
+        
+        let savedRecipes = UINavigationController(rootViewController: assembly.createFavoriteModule())
+        let createRecipes = UINavigationController(rootViewController: assembly.createRecipeModule())
+        let myProfile = UINavigationController(rootViewController: assembly.myProfileModule())
+        
+        let mockVC = UIViewController()
+        mockVC.tabBarItem.image = UIImage(named: "TabBarItem3")
+
+        tabBar.viewControllers = [
+            mainRouter.navigationController,
+            savedRecipes,
+            createRecipes,
+            mockVC,         //search
+            myProfile
+        ]
+
+        let nav = UINavigationController(rootViewController: tabBar)
         nav.setNavigationBarHidden(true, animated: false)
         
         if let scene = view.window?.windowScene {
