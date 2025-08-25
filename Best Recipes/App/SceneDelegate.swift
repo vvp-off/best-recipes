@@ -29,16 +29,17 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let mainRouter: MainRouterProtocol = assembly.createMainRouter()
         
         let savedRecipes = UINavigationController(rootViewController: assembly.createFavoriteModule())
-        
         let createRecipes = UINavigationController(rootViewController: assembly.createRecipeModule())
-        
         let myProfile = UINavigationController(rootViewController: assembly.myProfileModule())
+        
+        let mockVC = UIViewController()
+        mockVC.tabBarItem.image = UIImage(named: "TabBarItem3")
 
         tabBar.viewControllers = [
             mainRouter.navigationController,
             savedRecipes,
             createRecipes,
-            UIViewController(),         //search
+            mockVC,         //search
             myProfile
         ]
         
