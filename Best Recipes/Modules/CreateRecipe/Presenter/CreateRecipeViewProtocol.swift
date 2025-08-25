@@ -1,31 +1,18 @@
-//
-//  CreateRecipeViewProtocol.swift
-//  Best Recipes
-//
-//  Created by Мария Родионова on 25.08.2025.
-//
 
-import Foundation
 import UIKit
 
 protocol CreateRecipeViewProtocol: AnyObject {
-
-    func showAlert(title: String, message: String)
-    func showSuccessAlert(completion: @escaping () -> Void)
-    
-
-    func presentImagePickerAlert()
-    func presentImagePicker(sourceType: UIImagePickerController.SourceType)
-    
-
-    func presentServesSelector(options: [Int], completion: @escaping (Int) -> Void)
-    func presentTimeSelector(options: [(Int, String)], completion: @escaping (String) -> Void)
-    
-
-    func updateServesValue(_ serves: Int)
-    func updateTimeValue(_ timeString: String)
+    func showAlert(title: String, message: String, completion: (() -> Void)?)
     func clearAllFields()
-    
+    func updateServesValue(_ value: String)
+    func updateTimeValue(_ value: String)
+    func setImage(_ image: UIImage)
+    func resetToDefaultImage()
+}
 
-    func collectIngredients() -> [ExtendedIngredient]
+protocol CreateRecipePresenterProtocol: AnyObject {
+    func didSelectServes(_ serves: Int)
+    func didSelectTime(_ minutes: Int, title: String)
+    func didTapCreateRecipe(title: String, ingredients: [ExtendedIngredient], instructions: String)
+    func didPickImage(_ image: UIImage)
 }

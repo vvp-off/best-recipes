@@ -8,6 +8,8 @@
 import UIKit
 
 class Assembly: AssemblyProtocol {
+
+    
     // TabBar
     func createTabBar() -> TabBarViewController {
         return TabBarViewController()
@@ -64,11 +66,10 @@ class Assembly: AssemblyProtocol {
     }
 
     func createRecipeModule() -> CreateRecipeViewController {
-        let viewController = CreateRecipeViewController()
-
-        viewController.navigationItem.title = "Create recipe"
-        
-        return viewController
+        let view = CreateRecipeViewController()
+        let presenter = CreateRecipePresenter(view: view)
+        view.presenter = presenter
+        return view
     }
     
     
