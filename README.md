@@ -1,4 +1,4 @@
-# best-recipes 🍲
+# Best Recipes 🍲
 
 Это iOS-приложение для подбора и ведения рецептов.
 Ищи блюда по ингредиентам и категориям, сохраняй любимое, составляй список покупок и готовь по пошаговым инструкциям с таймерами и фото.
@@ -31,8 +31,8 @@
 <img src="https://img.shields.io/badge/MaryRodionova-pink?style=plastic"/></a>
 <a href="https://github.com/dsun14">
 <img src="https://img.shields.io/badge/Dasha-blue?style=plastic"/></a>
-<a href="https://github.com/GolfAlfaSierraK">
-<img src="https://img.shields.io/badge/AArtyom-purple?style=plastic"/></a>
+<a href="https://github.com/GolfAlfaSierra">
+<img src="https://img.shields.io/badge/Artyom-purple?style=plastic"/></a>
 
 </p>
 
